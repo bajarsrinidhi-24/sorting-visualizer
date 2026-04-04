@@ -4,10 +4,12 @@
 This project helps students understand how different sorting algorithms work internally with step-by-step execution, animations, and live code visualization.
 
 ---
+## Live Demo
+ https://bajarsrinidhi-24.github.io/sorting-visualizer/
 
 ## 📸 Preview  
 
-![Sorting Visualizer](screenshot.png)
+![Sorting Visualizer](Screenshot 2026-04-05 010843)
 
 ---
 
@@ -94,5 +96,3 @@ This project helps students understand how different sorting algorithms work int
 If you like this project, please ⭐ star the repository!  
 It motivates me to build more awesome projects 🚀
 
-## Live Demo
- https://bajarsrinidhi-24.github.io/sorting-visualizer/
