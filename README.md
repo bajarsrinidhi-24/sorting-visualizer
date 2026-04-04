@@ -18,4 +18,4 @@ This project visualizes sorting algorithms step-by-step.
 - JavaScript
 
 ## Live Demo
-(Add your GitHub Pages link here)
+ https://bajarsrinidhi-24.github.io/sorting-visualizer/
