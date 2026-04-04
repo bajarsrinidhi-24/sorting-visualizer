@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sorting Algorithm Visualizer | Live Code | Fullscreen | 6 Algorithms</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0f0c29, #1a1a3e, #24243e);
+            font-family: 'Inter', -apple-system, 'Segoe UI', 'Fira Code', monospace;
+            min-height: 100vh;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body.fullscreen-mode .container {
+            border-radius: 0;
+            max-width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.05)"/><circle cx="30" cy="25" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="70" cy="45" r="1.5" fill="rgba(255,255,255,0.04)"/><circle cx="85" cy="70" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="85" r="1.5" fill="rgba(255,255,255,0.03)"/></svg>');
+            background-repeat: repeat;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.95));
+            padding: 1.2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .header-controls {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+            color: white;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .complexity-badge {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(0,0,0,0.5);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .badge.time { color: #facc15; border-left: 2px solid #facc15; }
+        .badge.space { color: #34d399; border-left: 2px solid #34d399; }
+
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .left-panel {
+            flex: 1.2;
+            min-width: 360px;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 1.5rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .right-panel {
+            flex: 2;
+            min-width: 480px;
+            padding: 1.5rem;
+        }
+
+        .code-block {
+            background: rgba(10, 15, 26, 0.95);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Fira Code', monospace;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .code-title {
+            color: #60a5fa;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .live-badge {
+            background: #10b981;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            color: white;
+        }
+
+        .code-content {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            white-space: pre-wrap;
+        }
+
+        .code-line {
+            display: block;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all 0.1s;
+        }
+
+        .code-line.highlight {
+            background: #3b82f660;
+            border-left: 3px solid #60a5fa;
+            padding-left: 8px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .workflow-panel {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-bottom: 1.2rem;
+            border-left: 3px solid #a78bfa;
+        }
+
+        .workflow-title {
+            font-size: 0.7rem;
+            color: #a78bfa;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .workflow-text {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            font-family: monospace;
+        }
+
+        .pointer-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 0.8rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pointer-title {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+
+        .pointer-values {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .pointer-item {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .pointer-label {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .pointer-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #facc15;
+            font-family: monospace;
+        }
+
+        .algo-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .algo-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.4rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+
+        .algo-btn.active {
+            background: #3b82f6;
+            border-color: #60a5fa;
+            color: white;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .visualization {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            min-height: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 18px;
+            position: relative;
+            min-height: 260px;
+        }
+
+        .card-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-wrapper.swap-left { animation: swapLeftAnim 0.4s ease-in-out; }
+        .card-wrapper.swap-right { animation: swapRightAnim 0.4s ease-in-out; }
+
+        @keyframes swapLeftAnim {
+            0% { transform: translateX(0); }
+            30% { transform: translateX(-40px); }
+            70% { transform: translateX(40px); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes swapRightAnim {
+            0% { transform: translateX(0); }
+            30% { transform: translateX(40px); }
+            70% { transform: translateX(-40px); }
+            100% { transform: translateX(0); }
+        }
+
+        .pointer-arrow {
+            font-size: 14px;
+            font-weight: bold;
+            color: #facc15;
+            text-shadow: 0 0 6px #facc15;
+            margin-bottom: 4px;
+        }
+
+        .ball-animation {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #facc15, #f59e0b);
+            border-radius: 50%;
+            box-shadow: 0 0 12px #facc15;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        .number-card {
+            width: 75px;
+            height: 95px;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+            border: 2px solid #334155;
+        }
+
+        .number-card.comparing { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.5); transform: scale(1.03); }
+        .number-card.min-found { border-color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.4); }
+        .number-card.sorted { border-color: #22c55e; background: linear-gradient(145deg, #1e5a3a, #0f3a2a); box-shadow: 0 0 12px rgba(34,197,94,0.5); }
+
+        .card-value { font-size: 26px; font-weight: 800; color: #f1f5f9; font-family: monospace; }
+        .card-index { font-size: 9px; color: #64748b; margin-top: 4px; }
+
+        .action-message {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 12px;
+            padding: 0.7rem;
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.7rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #3b82f6;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover:not(:disabled) { background: #2563eb; transform: translateY(-2px); }
+        button:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+
+        .settings {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .control-group { display: flex; align-items: center; gap: 0.6rem; flex: 1; }
+        .control-group label { font-size: 0.7rem; color: #94a3b8; }
+        input[type="range"] { flex: 1; height: 3px; border-radius: 5px; background: #334155; }
+        .value-display { font-size: 0.7rem; background: #0f172a; padding: 2px 8px; border-radius: 20px; color: #60a5fa; }
+
+        .step-info { text-align: center; margin-top: 0.8rem; font-size: 0.75rem; color: #94a3b8; }
+        .sound-toggle { display: flex; align-items: center; gap: 6px; background: rgba(30,41,59,0.8); padding: 4px 12px; border-radius: 40px; cursor: pointer; width: fit-content; margin-top: 0.8rem; }
+        footer { background: rgba(15,23,42,0.8); padding: 0.6rem; text-align: center; font-size: 0.6rem; color: #64748b; border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        @media (max-width: 900px) { 
+            .two-columns { flex-direction: column; } 
+            .number-card { width: 60px; height: 80px; } 
+            .card-value { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Sorting Algorithm Visualizer | Live Code Execution</h1>
+        <div class="complexity-badge" id="complexityPanel">
+            <span class="badge time">⏱️ Time: O(n²)</span>
+            <span class="badge space">💾 Space: O(1)</span>
+        </div>
+        <div class="header-controls">
+            <button class="icon-btn" id="fullscreenBtn" title="Fullscreen">⛶</button>
+            <button class="icon-btn" id="minimizeViewBtn" title="Minimize View" style="display:none;">🗗</button>
+        </div>
+    </div>
+
+    <div class="two-columns">
+        <div class="left-panel">
+            <div class="code-block">
+                <div class="code-title">
+                    <span>📜 LIVE EXECUTION CODE <span id="algoNameBadge">Bubble Sort</span></span>
+                    <span class="live-badge">⚡ current line highlighted</span>
+                </div>
+                <div class="code-content" id="codeContent"></div>
+            </div>
+            <div class="workflow-panel">
+                <div class="workflow-title">⚙️ WORKFLOW / STEP LOGIC</div>
+                <div class="workflow-text" id="workflowText">Compare adjacent elements, swap if out of order. Largest element bubbles to end each pass.</div>
+            </div>
+            <div class="pointer-card">
+                <div class="pointer-title">📍 POINTERS (i, j, compare/min)</div>
+                <div class="pointer-values">
+                    <div class="pointer-item"><span class="pointer-label">i (outer):</span><span class="pointer-value" id="pointerI">-</span></div>
+                    <div class="pointer-item"><span class="pointer-label">j (inner):</span><span class="pointer-value" id="pointerJ">-</span></div>
+                    <div class="pointer-item"><span class="pointer-label">compare/min:</span><span class="pointer-value" id="pointerExtra">-</span></div>
+                </div>
+            </div>
+            <div class="algo-selector" id="algoSelector">
+                <button class="algo-btn active" data-algo="bubble">🫧 Bubble</button>
+                <button class="algo-btn" data-algo="selection">🎯 Selection</button>
+                <button class="algo-btn" data-algo="insertion">📌 Insertion</button>
+                <button class="algo-btn" data-algo="merge">🔄 Merge</button>
+                <button class="algo-btn" data-algo="quick">⚡ Quick</button>
+                <button class="algo-btn" data-algo="heap">🗻 Heap</button>
+            </div>
+            <div class="sound-toggle" id="soundToggle"><span>🔊</span> <span id="soundLabel">Sound ON</span></div>
+        </div>
+
+        <div class="right-panel">
+            <div class="visualization" id="visualizationArea">
+                <div class="cards-container" id="cardsContainer"></div>
+            </div>
+            <div class="action-message" id="actionMessage">✨ Click NEXT or AUTO to visualize sorting with live code highlighting</div>
+            <div class="controls">
+                <button id="prevBtn" disabled>◀ PREV</button>
+                <button id="nextBtn">NEXT ▶</button>
+                <button id="resetBtn">⟳ RESET</button>
+                <button id="randomBtn">🎲 RANDOM</button>
+                <button id="autoBtn">▶ AUTO</button>
+            </div>
+            <div class="settings">
+                <div class="control-group"><label>🐢 SPEED</label><input type="range" id="speedSlider" min="500" max="1800" value="800"><span class="value-display" id="speedValue">800ms</span></div>
+                <div class="control-group"><label>📊 SIZE</label><input type="range" id="sizeSlider" min="5" max="8" value="7"><span class="value-display" id="sizeValue">7</span></div>
+            </div>
+            <div class="step-info">Step: <strong id="stepCounter">0</strong> / <span id="totalSteps">0</span></div>
+        </div>
+    </div>
+    <footer>🔴 Comparing | 🟢 Min/Key | 🟢🟢 Sorted = Green | Ball drop + physical swap | Live code line highlighting | Fullscreen mode</footer>
+</div>
+
+<script>
+    (function(){
+        let arraySize = 7;
+        // Default array based on screenshot: [43,61,17,55,24,60,40,22] but size 8, let's use that as initial if size 8 else generate
+        let originalArray = [43, 61, 17, 55, 24, 60, 40, 22];
+        let steps = [];
+        let currentStep = 0;
+        let currentAlgo = 'bubble';
+        let autoInterval = null;
+        let autoActive = false;
+        let stepDelay = 800;
+        let soundEnabled = true;
+        let audioCtx = null;
+        let isFullscreen = false;
+
+        // Fullscreen handling
+        const container = document.querySelector('.container');
+        const body = document.body;
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const minimizeViewBtn = document.getElementById('minimizeViewBtn');
+
+        function toggleFullscreen() {
+            if (!isFullscreen) {
+                body.classList.add('fullscreen-mode');
+                isFullscreen = true;
+                fullscreenBtn.style.display = 'none';
+                minimizeViewBtn.style.display = 'flex';
+            } else {
+                body.classList.remove('fullscreen-mode');
+                isFullscreen = false;
+                fullscreenBtn.style.display = 'flex';
+                minimizeViewBtn.style.display = 'none';
+            }
+            // Trigger reflow for animations
+            setTimeout(() => {
+                if (steps[currentStep]) renderCards(steps[currentStep].array, steps[currentStep].pointers || {}, steps[currentStep].swap, steps[currentStep].swapIndices, steps[currentStep].allSorted);
+            }, 50);
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        minimizeViewBtn.addEventListener('click', toggleFullscreen);
+
+        // Complexity & metadata
+        const complexityMap = {
+            bubble: { time: "O(n²)", space: "O(1)" },
+            selection: { time: "O(n²)", space: "O(1)" },
+            insertion: { time: "O(n²)", space: "O(1)" },
+            merge: { time: "O(n log n)", space: "O(n)" },
+            quick: { time: "O(n log n) avg / O(n²) worst", space: "O(log n)" },
+            heap: { time: "O(n log n)", space: "O(1)" }
+        };
+        const workflowMap = {
+            bubble: "Bubble Sort: repeatedly steps through list, compares adjacent elements and swaps if wrong order. After each pass largest element 'bubbles' to end. i counts passes, j scans adjacent pairs.",
+            selection: "Selection Sort: divides array into sorted (left) and unsorted. Finds minimum in unsorted region (via j loop) and swaps with first unsorted position (i). i increments after each min selection.",
+            insertion: "Insertion Sort: builds final sorted array one item at a time. Takes key at i, shifts larger elements right (j decrements), inserts key into correct sorted position.",
+            merge: "Merge Sort: divide & conquer. Recursively splits array into halves, sorts them, then merges sorted halves using auxiliary space.",
+            quick: "Quick Sort: picks pivot (last element), partitions array so smaller left, larger right. Recursively sorts subarrays. i,j represent partition indices.",
+            heap: "Heap Sort: builds max-heap from array, then repeatedly swaps root (max) with last unsorted element and heapifies reduced heap."
+        };
+        
+        const codeLinesMap = {
+            bubble: ["function bubbleSort(arr) {","  let n = arr.length;","  for (let i = 0; i < n-1; i++) {","    for (let j = 0; j < n-i-1; j++) {","      if (arr[j] > arr[j+1]) {","        swap(arr, j, j+1);","      }","    }","  }","  return arr;","}"],
+            selection: ["function selectionSort(arr) {","  let n = arr.length;","  for (let i = 0; i < n-1; i++) {","    let minIdx = i;","    for (let j = i+1; j < n; j++) {","      if (arr[j] < arr[minIdx]) {","        minIdx = j;","      }","    }","    if (minIdx !== i) swap(arr, i, minIdx);","  }","  return arr;","}"],
+            insertion: ["function insertionSort(arr) {","  let n = arr.length;","  for (let i = 1; i < n; i++) {","    let key = arr[i];","    let j = i-1;","    while (j >= 0 && arr[j] > key) {","      arr[j+1] = arr[j];","      j--;","    }","    arr[j+1] = key;","  }","  return arr;","}"],
+            merge: ["function mergeSort(arr, l, r) {","  if (l >= r) return;","  let m = Math.floor((l+r)/2);","  mergeSort(arr, l, m);","  mergeSort(arr, m+1, r);","  merge(arr, l, m, r);","}","function merge(arr, l, m, r) {","  let left = arr.slice(l, m+1);","  let right = arr.slice(m+1, r+1);","  let i=0, j=0, k=l;","  while(i<left.length && j<right.length) {","    if(left[i] <= right[j]) arr[k++] = left[i++];","    else arr[k++] = right[j++];","  }","  while(i<left.length) arr[k++] = left[i++];","  while(j<right.length) arr[k++] = right[j++];","}"],
+            quick: ["function quickSort(arr, low, high) {","  if (low < high) {","    let pi = partition(arr, low, high);","    quickSort(arr, low, pi-1);","    quickSort(arr, pi+1, high);","  }","}","function partition(arr, low, high) {","  let pivot = arr[high];","  let i = low - 1;","  for (let j = low; j < high; j++) {","    if (arr[j] <= pivot) {","      i++;","      swap(arr, i, j);","    }","  }","  swap(arr, i+1, high);","  return i+1;","}"],
+            heap: ["function heapSort(arr) {","  let n = arr.length;","  for (let i = Math.floor(n/2)-1; i >= 0; i--)","    heapify(arr, n, i);","  for (let i = n-1; i > 0; i--) {","    swap(arr, 0, i);","    heapify(arr, i, 0);","  }","  return arr;","}","function heapify(arr, n, i) {","  let largest = i;","  let l = 2*i+1, r = 2*i+2;","  if (l<n && arr[l] > arr[largest]) largest = l;","  if (r<n && arr[r] > arr[largest]) largest = r;","  if (largest !== i) {","    swap(arr, i, largest);","    heapify(arr, n, largest);","  }","}"]
+        };
+
+        function initAudio(){ if(!audioCtx && soundEnabled) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
+        function playCompare(){ if(!soundEnabled)return; try{ initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); if(!audioCtx)return; const osc=audioCtx.createOscillator(), gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=520; gain.gain.value=0.07; osc.type='sine'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.12); osc.stop(audioCtx.currentTime+0.12); }catch(e){} }
+        function playSwap(){ if(!soundEnabled)return; try{ initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); if(!audioCtx)return; const osc=audioCtx.createOscillator(), gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=720; gain.gain.value=0.1; osc.type='triangle'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.15); osc.stop(audioCtx.currentTime+0.15); setTimeout(()=>{ const osc2=audioCtx.createOscillator(),gain2=audioCtx.createGain(); osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.frequency.value=880; gain2.gain.value=0.08; osc2.type='triangle'; osc2.start(); gain2.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.15); osc2.stop(audioCtx.currentTime+0.15); },40); }catch(e){} }
+        function playComplete(){ if(!soundEnabled)return; try{ initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); if(!audioCtx)return; [523,659,784,1047].forEach((freq,i)=>{ setTimeout(()=>{ const osc=audioCtx.createOscillator(), gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=freq; gain.gain.value=0.1; osc.type='sine'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.3); osc.stop(audioCtx.currentTime+0.3); },i*100); }); }catch(e){} }
+
+        function generateRandomArray(size){ return Array.from({length:size},()=>Math.floor(Math.random()*55)+10); }
+        function createBallAnimation(sx,sy,ex,ey,cb){ const ball=document.createElement('div'); ball.className='ball-animation'; ball.style.left=sx+'px'; ball.style.top=sy+'px'; document.getElementById('visualizationArea').appendChild(ball); let start=null; const dur=350; function anim(t){ if(!start) start=t; const p=Math.min(1,(t-start)/dur); const ease=1-Math.pow(1-p,2); const cx=sx+(ex-sx)*ease, cy=sy+(ey-sy)*ease+10*Math.sin(Math.PI*p); ball.style.left=cx+'px'; ball.style.top=cy+'px'; if(p<1) requestAnimationFrame(anim); else { ball.remove(); if(cb)cb(); } } requestAnimationFrame(anim); }
+
+        function renderCards(arr,pointers={},isSwapping=false,swapIndices=[],allSorted=false){
+            const container=document.getElementById('cardsContainer'); container.innerHTML='';
+            arr.forEach((val,idx)=>{
+                const wrapper=document.createElement('div'); wrapper.className='card-wrapper';
+                if(isSwapping && swapIndices.includes(idx)) wrapper.classList.add(swapIndices[0]>swapIndices[1]?'swap-left':'swap-right');
+                if(pointers.i===idx){ const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ i'; wrapper.appendChild(a); }
+                if(pointers.j===idx){ const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ j'; wrapper.appendChild(a); }
+                if(pointers.extra===idx){ const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ min/key'; wrapper.appendChild(a); }
+                const card=document.createElement('div'); card.className='number-card';
+                if(pointers.comparing?.includes(idx)) card.classList.add('comparing');
+                if(pointers.minFound===idx) card.classList.add('min-found');
+                if(allSorted || (pointers.sorted && pointers.sorted.includes(idx))) card.classList.add('sorted');
+                card.innerHTML=`<div class="card-value">${val}</div><div class="card-index">[${idx}]</div>`;
+                wrapper.appendChild(card); container.appendChild(wrapper);
+            });
+        }
+
+        // Step generators (all algorithms)
+        function generateBubbleSteps(a){ let s=[], w=[...a], n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Bubble Sort Start",lineIdx:2}); for(let i=0;i<n-1;i++) for(let j=0;j<n-i-1;j++){ s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`🔍 Compare ${w[j]} & ${w[j+1]}`,lineIdx:4}); if(w[j]>w[j+1]){ [w[j],w[j+1]]=[w[j+1],w[j]]; s.push({array:[...w],pointers:{i,j},desc:`🔄 Swapped!`,swap:true,swapIndices:[j,j+1],lineIdx:5}); } } s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:9}); return s; }
+        function generateSelectionSteps(a){ let s=[], w=[...a], n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Selection Sort",lineIdx:2}); for(let i=0;i<n-1;i++){ let min=i; s.push({array:[...w],pointers:{i,minFound:i,comparing:[i]},desc:`Pass ${i+1}: assume min at ${i}`,lineIdx:3}); for(let j=i+1;j<n;j++){ s.push({array:[...w],pointers:{i,j,minFound:min,comparing:[min,j]},desc:`Compare ${w[j]} < ${w[min]}`,lineIdx:5}); if(w[j]<w[min]){ min=j; s.push({array:[...w],pointers:{i,minFound:min,comparing:[min]},desc:`⭐ New min ${min}`,lineIdx:6}); } } if(min!==i){ [w[i],w[min]]=[w[min],w[i]]; s.push({array:[...w],pointers:{i},desc:`Swap ${i} ↔ ${min}`,swap:true,swapIndices:[i,min],lineIdx:9}); } } s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:11}); return s; }
+        function generateInsertionSteps(a){ let s=[], w=[...a], n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Insertion Sort",lineIdx:2}); for(let i=1;i<n;i++){ let key=w[i], j=i-1; s.push({array:[...w],pointers:{i,comparing:[i]},desc:`Pick key=${key}`,lineIdx:3}); while(j>=0 && w[j]>key){ s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`Shift ${w[j]} right`,lineIdx:5}); w[j+1]=w[j]; s.push({array:[...w],pointers:{i},desc:`Shifted`,swap:true,swapIndices:[j+1],lineIdx:6}); j--; } if(w[j+1]!==key){ w[j+1]=key; s.push({array:[...w],pointers:{i},desc:`Inserted ${key}`,swap:true,swapIndices:[j+1],lineIdx:8}); } } s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:10}); return s; }
+        function generateMergeSteps(a){ let s=[], w=[...a]; function merge(l,m,r){ let left=w.slice(l,m+1),right=w.slice(m+1,r+1),i=0,j=0,k=l; while(i<left.length && j<right.length){ s.push({array:[...w],pointers:{comparing:[k]},desc:`Compare ${left[i]} & ${right[j]}`,lineIdx:12}); if(left[i]<=right[j]) w[k++]=left[i++]; else w[k++]=right[j++]; s.push({array:[...w],pointers:{},desc:`Merge`,swap:true,swapIndices:[k-1],lineIdx:13}); } while(i<left.length) w[k++]=left[i++]; while(j<right.length) w[k++]=right[j++]; s.push({array:[...w],pointers:{},desc:`Merged [${l}..${r}]`,lineIdx:16}); } function ms(l,r){ if(l>=r) return; let m=Math.floor((l+r)/2); ms(l,m); ms(m+1,r); merge(l,m,r); } s.push({array:[...w],pointers:{},desc:"✨ Merge Sort",lineIdx:2}); ms(0,w.length-1); s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:0}); return s; }
+        function generateQuickSteps(a){ let s=[], w=[...a]; function partition(l,r){ let pivot=w[r], i=l-1; for(let j=l;j<r;j++){ s.push({array:[...w],pointers:{comparing:[j,r]},desc:`Compare ${w[j]} <= pivot ${pivot}`,lineIdx:11}); if(w[j]<=pivot){ i++; [w[i],w[j]]=[w[j],w[i]]; if(i!==j) s.push({array:[...w],pointers:{},desc:`Swap smaller`,swap:true,swapIndices:[i,j],lineIdx:13}); } } [w[i+1],w[r]]=[w[r],w[i+1]]; s.push({array:[...w],pointers:{},desc:`Pivot placed`,swap:true,swapIndices:[i+1,r],lineIdx:16}); return i+1; } function qs(l,r){ if(l<r){ let pi=partition(l,r); qs(l,pi-1); qs(pi+1,r); } } s.push({array:[...w],pointers:{},desc:"✨ Quick Sort",lineIdx:2}); qs(0,w.length-1); s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:0}); return s; }
+        function generateHeapSteps(a){ let s=[], w=[...a], n=w.length; function heapify(n,i){ let largest=i, l=2*i+1, r=2*i+2; if(l<n && w[l]>w[largest]) largest=l; if(r<n && w[r]>w[largest]) largest=r; if(largest!==i){ [w[i],w[largest]]=[w[largest],w[i]]; s.push({array:[...w],pointers:{},desc:`Heapify swap`,swap:true,swapIndices:[i,largest],lineIdx:16}); heapify(n,largest); } } s.push({array:[...w],pointers:{},desc:"✨ Heap Sort: build max-heap",lineIdx:2}); for(let i=Math.floor(n/2)-1;i>=0;i--) heapify(n,i); for(let i=n-1;i>0;i--){ [w[0],w[i]]=[w[i],w[0]]; s.push({array:[...w],pointers:{},desc:`Extract max to end`,swap:true,swapIndices:[0,i],lineIdx:5}); heapify(i,0); } s.push({array:[...w],pointers:{},desc:"✅ Sorted! All green",complete:true,allSorted:true,lineIdx:7}); return s; }
+
+        function rebuildSteps(){ let arr=[...originalArray]; if(currentAlgo==='bubble') steps=generateBubbleSteps(arr); else if(currentAlgo==='selection') steps=generateSelectionSteps(arr); else if(currentAlgo==='insertion') steps=generateInsertionSteps(arr); else if(currentAlgo==='merge') steps=generateMergeSteps(arr); else if(currentAlgo==='quick') steps=generateQuickSteps(arr); else steps=generateHeapSteps(arr); currentStep=0; updateUI(); updateStepDisplay(); updateCodeAndMeta(); }
+        
+        function highlightCodeLine(lineNumber){ const codeLines = document.querySelectorAll('.code-line'); codeLines.forEach((line, idx) => { if(idx === lineNumber) line.classList.add('highlight'); else line.classList.remove('highlight'); }); }
+        
+        function updateUI(){ if(!steps.length) return; let step=steps[currentStep]; if(step){ renderCards(step.array, step.pointers||{}, step.swap, step.swapIndices, step.allSorted); document.getElementById('pointerI').innerText=step.pointers?.i!==undefined?step.pointers.i: '-'; document.getElementById('pointerJ').innerText=step.pointers?.j!==undefined?step.pointers.j: '-'; let extra=step.pointers?.j1!==undefined?step.pointers.j1:(step.pointers?.minFound!==undefined?step.pointers.minFound:'-'); document.getElementById('pointerExtra').innerText=extra; document.getElementById('actionMessage').innerHTML=step.desc; if(step.lineIdx !== undefined) highlightCodeLine(step.lineIdx); if(step.compare) playCompare(); if(step.swap){ playSwap(); let cards=document.querySelectorAll('.card-wrapper'); if(step.swapIndices && step.swapIndices.length>=2 && cards[step.swapIndices[0]] && cards[step.swapIndices[1]]){ let r1=cards[step.swapIndices[0]].getBoundingClientRect(), r2=cards[step.swapIndices[1]].getBoundingClientRect(); if(r1 && r2) createBallAnimation(r1.left+38, r1.top-15, r2.left+38, r2.top-15); } } if(step.complete) playComplete(); } }
+        
+        function updateCodeAndMeta(){
+            let lines = codeLinesMap[currentAlgo];
+            let codeHtml = lines.map((line, idx) => `<span class="code-line" data-line="${idx}">${escapeHtml(line)}</span>`).join('\n');
+            document.getElementById('codeContent').innerHTML = codeHtml;
+            document.getElementById('workflowText').innerHTML = workflowMap[currentAlgo];
+            document.getElementById('algoNameBadge').innerHTML = currentAlgo.charAt(0).toUpperCase()+currentAlgo.slice(1)+' Sort';
+            let comp=complexityMap[currentAlgo];
+            document.getElementById('complexityPanel').innerHTML = `<span class="badge time">⏱️ Time: ${comp.time}</span><span class="badge space">💾 Space: ${comp.space}</span>`;
+            if(steps[currentStep] && steps[currentStep].lineIdx !== undefined) highlightCodeLine(steps[currentStep].lineIdx);
+            else highlightCodeLine(0);
+        }
+        
+        function escapeHtml(s){ return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+        function updateStepDisplay(){ document.getElementById('stepCounter').innerText=currentStep+1; document.getElementById('totalSteps').innerText=steps.length; document.getElementById('prevBtn').disabled=currentStep<=0; document.getElementById('nextBtn').disabled=currentStep>=steps.length-1; }
+        function nextStep(){ if(steps.length && currentStep<steps.length-1){ currentStep++; updateUI(); updateStepDisplay(); } }
+        function prevStep(){ if(steps.length && currentStep>0){ currentStep--; updateUI(); updateStepDisplay(); } }
+        function resetStep(){ currentStep=0; updateUI(); updateStepDisplay(); if(autoActive) stopAuto(); }
+        function randomize(){ originalArray=generateRandomArray(arraySize); rebuildSteps(); if(autoActive) stopAuto(); }
+        function changeSize(v){ arraySize=v; document.getElementById('sizeValue').innerText=arraySize; if(arraySize===8) originalArray=[43,61,17,55,24,60,40,22]; else originalArray=generateRandomArray(arraySize); rebuildSteps(); if(autoActive) stopAuto(); }
+        function startAuto(){ if(autoInterval) clearInterval(autoInterval); autoActive=true; document.getElementById('autoBtn').innerHTML='⏸ STOP'; autoInterval=setInterval(()=>{ if(currentStep<steps.length-1) nextStep(); else stopAuto(); }, stepDelay); }
+        function stopAuto(){ if(autoInterval) clearInterval(autoInterval); autoActive=false; document.getElementById('autoBtn').innerHTML='▶ AUTO'; }
+        function toggleAuto(){ if(autoActive) stopAuto(); else startAuto(); }
+        function toggleSound(){ soundEnabled=!soundEnabled; document.getElementById('soundLabel').innerText=soundEnabled?'Sound ON':'Sound OFF'; if(soundEnabled && audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }
+
+        const prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn'), resetBtn=document.getElementById('resetBtn'), randomBtn=document.getElementById('randomBtn'), autoBtn=document.getElementById('autoBtn');
+        const speedSlider=document.getElementById('speedSlider'), sizeSlider=document.getElementById('sizeSlider');
+        prevBtn.onclick=()=>{ if(autoActive) stopAuto(); prevStep(); };
+        nextBtn.onclick=()=>{ if(autoActive) stopAuto(); nextStep(); };
+        resetBtn.onclick=()=>{ if(autoActive) stopAuto(); resetStep(); };
+        randomBtn.onclick=()=>{ if(autoActive) stopAuto(); randomize(); };
+        autoBtn.onclick=toggleAuto; document.getElementById('soundToggle').onclick=toggleSound;
+        speedSlider.oninput=(e)=>{ stepDelay=parseInt(e.target.value); document.getElementById('speedValue').innerText=stepDelay+'ms'; if(autoActive){ stopAuto(); startAuto(); } };
+        sizeSlider.oninput=(e)=>{ if(autoActive) stopAuto(); changeSize(parseInt(e.target.value)); };
+        document.querySelectorAll('.algo-btn').forEach(btn=>{ btn.onclick=()=>{ let algo=btn.getAttribute('data-algo'); if(algo===currentAlgo) return; if(autoActive) stopAuto(); currentAlgo=algo; document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); rebuildSteps(); }; });
+        
+        // Initialize with size 8 matching screenshot
+        arraySize = 8;
+        originalArray = [43, 61, 17, 55, 24, 60, 40, 22];
+        document.getElementById('sizeSlider').value = 8;
+        document.getElementById('sizeValue').innerText = 8;
+        rebuildSteps();
+        document.body.addEventListener('click',()=>{ if(soundEnabled && audioCtx && audioCtx.state==='suspended') audioCtx.resume(); },{once:true});
+    })();
+</script>
+</body>
+</html>
