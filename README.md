@@ -9,7 +9,7 @@ This project helps students understand how different sorting algorithms work int
 
 ## 📸 Preview  
 
-![Sorting Visualizer](Screenshot 2026-04-05 010843)
+![Sorting Visualizer](screenshot.png)
 
 ---
 
