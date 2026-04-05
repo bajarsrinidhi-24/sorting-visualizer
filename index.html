@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Sorting Visualizer | Bubble · Selection · Insertion · Merge · Quick · Heap</title>
+    <title>Sorting Visualizer | Real Card Swap</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
+ 
         body {
             background: linear-gradient(145deg, #0a0f1a 0%, #0f172a 50%, #1a1a2e 100%);
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Fira Code', monospace;
+            font-family: 'Segoe UI', system-ui, monospace;
             min-height: 100vh;
             padding: 1rem;
-            transition: all 0.3s;
         }
-
-        body.fullscreen-active { padding: 0; }
-        body.fullscreen-active .container { border-radius: 0; max-width: 100%; height: 100vh; overflow-y: auto; }
-        body.fullscreen-active .two-columns { flex-direction: column; }
-        body.fullscreen-active .left-panel { order: 2; border-right: none; border-top: 1px solid rgba(255,255,255,0.2); flex-direction: row; flex-wrap: wrap; display: flex; gap: 1rem; padding: 1rem; }
-        body.fullscreen-active .left-panel > div { flex: 1; min-width: 240px; }
-        body.fullscreen-active .right-panel { order: 1; min-height: 60vh; }
-
+ 
         .container {
             max-width: 1500px;
             margin: 0 auto;
@@ -31,7 +23,7 @@
             box-shadow: 0 25px 45px -12px black, 0 0 0 1px rgba(255,255,255,0.15);
             overflow: hidden;
         }
-
+ 
         .header {
             background: linear-gradient(115deg, #0f172a, #1e1b3a);
             padding: 0.9rem 2rem;
@@ -39,7 +31,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.15);
             position: relative;
         }
-
+ 
         h1 {
             font-size: 1.6rem;
             font-weight: 700;
@@ -47,257 +39,171 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
         }
-
+ 
         .complexity-row { display: flex; justify-content: center; gap: 1.2rem; margin-top: 0.5rem; font-size: 0.75rem; }
-        .badge { background: #000000aa; padding: 0.25rem 1rem; border-radius: 40px; font-weight: 600; font-family: monospace; backdrop-filter: blur(4px); }
+        .badge { background: #000000aa; padding: 0.25rem 1rem; border-radius: 40px; font-weight: 600; font-family: monospace; }
         .badge.time { color: #facc15; border-left: 2px solid #facc15; background: #facc1520; }
         .badge.space { color: #2ecc71; border-left: 2px solid #2ecc71; background: #2ecc7120; }
-
+ 
         .header-controls { position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%); display: flex; gap: 0.7rem; }
-        .icon-btn { background: #ffffff20; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); padding: 0.35rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: #f1f5f9; transition: 0.2s; }
-        .icon-btn:hover { background: #3b82f6; border-color: #90cdf4; color: white; transform: scale(1.02); }
-
+        .icon-btn { background: #ffffff20; border: 1px solid rgba(255,255,255,0.3); padding: 0.35rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: #f1f5f9; transition: 0.2s; }
+        .icon-btn:hover { background: #3b82f6; border-color: #90cdf4; color: white; }
+ 
         .two-columns { display: flex; flex-wrap: wrap; }
-
-        .left-panel { flex: 1.1; min-width: 350px; background: rgba(8, 15, 26, 0.85); padding: 1.4rem; border-right: 1px solid rgba(255,255,255,0.1); }
+ 
+        .left-panel { flex: 1.1; min-width: 350px; background: rgba(8,15,26,0.85); padding: 1.4rem; border-right: 1px solid rgba(255,255,255,0.1); }
         .right-panel { flex: 2.2; min-width: 480px; padding: 1.4rem; }
-
+ 
         .code-box { background: #03060cee; border-radius: 20px; padding: 1rem; margin-bottom: 1rem; border: 1px solid #3b4e6e; font-family: 'Fira Code', monospace; }
         .code-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: #90cdf4; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .live-badge { background: #10b981; padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; color: white; font-weight: 600; }
         .code-content { font-size: 0.7rem; line-height: 1.6; color: #e2e8f0; white-space: pre-wrap; }
         .code-line { display: block; padding: 2px 4px; border-radius: 6px; }
         .code-line.highlight { background: #3b82f670; border-left: 3px solid #60a5fa; color: white; font-weight: 500; }
-
+ 
         .info-card { background: #0f172fdd; border-radius: 18px; padding: 0.8rem 1rem; margin-bottom: 1rem; border-left: 3px solid #c084fc; }
         .info-title { font-size: 0.7rem; color: #d8b4fe; letter-spacing: 1px; font-weight: 600; }
         .info-text { font-size: 0.8rem; color: #f1f5f9; margin-top: 5px; line-height: 1.4; }
         .complexity-table { display: flex; gap: 1rem; margin-top: 8px; font-size: 0.7rem; }
         .complexity-item { background: #00000066; padding: 0.2rem 0.8rem; border-radius: 20px; }
-
+ 
         .pointers-panel { background: #0f172fdd; border-radius: 18px; padding: 0.8rem 1rem; margin-bottom: 1rem; }
         .pointers-title { font-size: 0.7rem; color: #cbd5e6; font-weight: 600; }
         .pointers-flex { display: flex; gap: 1.2rem; margin-top: 8px; flex-wrap: wrap; }
         .pointer-chip { background: #000000aa; padding: 0.3rem 1rem; border-radius: 40px; display: flex; gap: 8px; font-size: 0.9rem; font-weight: 500; }
         .pointer-label { color: #94a3b8; }
         .pointer-value { color: #facc15; font-weight: 800; font-family: monospace; font-size: 1rem; }
-
+ 
         .algo-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
         .algo-btn { background: #1e2a4a; border: 1px solid #3b4e6e; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.75rem; font-weight: 600; cursor: pointer; color: #e2e8f0; transition: 0.2s; }
         .algo-btn.active { background: #3b82f6; border-color: #90cdf4; color: white; box-shadow: 0 0 10px #3b82f6; }
         .algo-btn:hover:not(.active) { background: #2d3b5e; transform: translateY(-1px); }
-
+ 
         .sound-mini { display: inline-flex; align-items: center; gap: 6px; background: #1e2a4acc; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; width: fit-content; margin-top: 0.5rem; color: #e2e8f0; border: 1px solid #3b4e6e; }
         .sound-mini:hover { background: #2d3b5e; }
-
-        /* === SWAP LOG === */
-        .swap-log-panel {
-            background: #03060cee;
-            border-radius: 18px;
-            padding: 0.8rem 1rem;
-            margin-top: 1rem;
-            border: 1px solid #3b4e6e;
-            max-height: 140px;
-            overflow-y: auto;
-        }
+ 
+        /* Swap log */
+        .swap-log-panel { background: #03060cee; border-radius: 18px; padding: 0.8rem 1rem; margin-top: 1rem; border: 1px solid #3b4e6e; max-height: 130px; overflow-y: auto; }
         .swap-log-title { font-size: 0.7rem; color: #90cdf4; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.5rem; }
         .swap-log-list { display: flex; flex-direction: column; gap: 3px; }
-        .swap-log-entry {
-            font-size: 0.72rem;
-            color: #e2e8f0;
-            background: #0f172fdd;
-            padding: 3px 10px;
-            border-radius: 20px;
-            border-left: 3px solid #f472b6;
-            font-family: monospace;
-            animation: logFadeIn 0.3s ease;
-        }
-        @keyframes logFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .swap-log-entry { font-size: 0.72rem; color: #e2e8f0; background: #0f172fdd; padding: 3px 10px; border-radius: 20px; border-left: 3px solid #f472b6; font-family: monospace; animation: logFadeIn 0.3s ease; }
+        @keyframes logFadeIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
         .swap-log-panel::-webkit-scrollbar { width: 4px; }
         .swap-log-panel::-webkit-scrollbar-thumb { background: #3b4e6e; border-radius: 4px; }
-
-        /* === VIS AREA === */
+ 
+        /* ===== VIS AREA — key: position:relative + overflow:visible ===== */
         .vis-area {
             background: #0a0f1cdd;
             border-radius: 24px;
-            padding: 1.2rem;
+            padding: 1.5rem 1.2rem 1.2rem;
             margin-bottom: 1rem;
-            min-height: 380px;
+            min-height: 280px;
             position: relative;
             border: 1px solid #3b4e6e;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.3);
-            overflow: hidden;
+            overflow: visible; /* allow cards to fly up above area */
         }
-
+ 
+        /* Container for static layout (used for measuring positions) */
         .cards-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 18px;
             position: relative;
         }
-
-        /* === CARD WRAPPER & SWAP ANIMATIONS === */
+ 
+        /* Each card wrapper — static in layout */
         .card-wrapper {
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 0.05s;
         }
-
-        /* Slide-cross swap animation */
-        .card-wrapper.swap-left {
-            animation: swapSlideLeft 0.55s cubic-bezier(0.68,-0.55,0.27,1.55);
+ 
+        /* The actual flying card — absolute, cloned during swap animation */
+        .flying-card {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: none;
+            transform-origin: center center;
         }
-        .card-wrapper.swap-right {
-            animation: swapSlideRight 0.55s cubic-bezier(0.68,-0.55,0.27,1.55);
-        }
-
-        @keyframes swapSlideLeft {
-            0%   { transform: translateX(0) translateY(0); }
-            25%  { transform: translateX(-50px) translateY(-28px); }
-            50%  { transform: translateX(-100px) translateY(0); }
-            75%  { transform: translateX(-50px) translateY(28px); }
-            100% { transform: translateX(0) translateY(0); }
-        }
-        @keyframes swapSlideRight {
-            0%   { transform: translateX(0) translateY(0); }
-            25%  { transform: translateX(50px) translateY(28px); }
-            50%  { transform: translateX(100px) translateY(0); }
-            75%  { transform: translateX(50px) translateY(-28px); }
-            100% { transform: translateX(0) translateY(0); }
-        }
-
-        /* 3D flip during swap */
-        .number-card.flipping {
-            animation: cardFlip3D 0.55s ease;
-        }
-        @keyframes cardFlip3D {
-            0%   { transform: rotateY(0deg) scale(1); }
-            25%  { transform: rotateY(90deg) scale(1.08); }
-            50%  { transform: rotateY(180deg) scale(1.12); }
-            75%  { transform: rotateY(90deg) scale(1.08); }
-            100% { transform: rotateY(0deg) scale(1); }
-        }
-
-        /* Shuffle stagger */
-        .card-wrapper.shuffle-anim {
-            animation: shuffleCard 0.4s ease both;
-        }
-        @keyframes shuffleCard {
-            0%   { transform: translateY(0) scale(1); opacity: 1; }
-            40%  { transform: translateY(-40px) scale(0.85); opacity: 0.6; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        /* Green flash when sorted */
-        .number-card.sorted-flash {
-            animation: sortedFlash 0.5s ease;
-        }
-        @keyframes sortedFlash {
-            0%   { box-shadow: 0 0 0 #2ecc71; }
-            50%  { box-shadow: 0 0 28px #2ecc71, 0 0 8px #2ecc71 inset; }
-            100% { box-shadow: 0 0 20px #2ecc71; }
-        }
-
+ 
         .pointer-arrow { font-size: 13px; font-weight: bold; color: #ffd966; text-shadow: 0 0 4px #ffaa33; margin-bottom: 4px; }
-
+ 
         .number-card {
-            width: 78px;
-            height: 98px;
+            width: 80px;
+            height: 100px;
             background: linear-gradient(145deg, #1f2a46, #0f172f);
-            border-radius: 20px;
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border: 2px solid #4a5a7a;
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            perspective: 600px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            user-select: none;
         }
-
-        .number-card.comparing { border-color: #ef4444; box-shadow: 0 0 22px #ef4444; transform: scale(1.05); background: linear-gradient(145deg, #2a1f2f, #1a0f1f); }
-        .number-card.min-found { border-color: #2ecc71; box-shadow: 0 0 22px #2ecc71; }
-        .number-card.sorted { border-color: #2ecc71; background: linear-gradient(145deg, #1b4d33, #0a2a1a); box-shadow: 0 0 20px #2ecc71; }
-
-        /* Suit symbols on card */
-        .card-suit-top { font-size: 11px; align-self: flex-start; padding-left: 8px; margin-top: 6px; color: #94a3b8; }
-        .card-value { font-size: 28px; font-weight: 800; color: #f8fafc; text-shadow: 0 1px 2px black; }
-        .card-index { font-size: 10px; color: #a0b4d0; margin-top: 5px; font-weight: 500; }
-
-        /* Card back face (shown mid-flip) */
-        .card-back {
-            position: absolute;
-            width: 78px;
-            height: 98px;
-            background: repeating-linear-gradient(45deg, #1e3a5f 0px, #1e3a5f 6px, #0f2040 6px, #0f2040 12px);
-            border-radius: 20px;
-            border: 2px solid #3b82f6;
-            opacity: 0;
-            pointer-events: none;
+ 
+        .number-card.comparing {
+            border-color: #ef4444;
+            box-shadow: 0 0 24px #ef4444aa, 0 8px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(145deg, #2a1020, #1a080f);
+            transform: scale(1.06);
         }
-
-        /* Bouncing ball */
+        .number-card.min-found { border-color: #f59e0b; box-shadow: 0 0 22px #f59e0b; }
+        .number-card.swapping {
+            border-color: #f472b6;
+            box-shadow: 0 0 28px #f472b6bb, 0 8px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(145deg, #2a1030, #180a20);
+            opacity: 0; /* hidden while clone flies */
+        }
+        .number-card.sorted {
+            border-color: #2ecc71;
+            background: linear-gradient(145deg, #1b4d33, #0a2a1a);
+            box-shadow: 0 0 22px #2ecc71aa;
+        }
+ 
+        .card-suit { font-size: 11px; align-self: flex-start; padding-left: 8px; margin-top: 5px; }
+        .card-value { font-size: 30px; font-weight: 800; color: #f8fafc; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1; }
+        .card-index { font-size: 10px; color: #7a90b0; margin-top: 4px; font-weight: 500; }
+ 
+        /* Bouncing Ball */
         .bouncing-ball {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            background: radial-gradient(circle at 35% 35%, #ffdd77, #f59e0b);
+            position: fixed;
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle at 35% 35%, #ffee88, #f59e0b);
             border-radius: 50%;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.4), 0 0 18px rgba(245,158,11,0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 16px rgba(245,158,11,0.9);
             pointer-events: none;
-            z-index: 1000;
-            transition: all 0.05s linear;
+            z-index: 10000;
         }
-
-        /* Swap glow overlay between two cards */
-        .swap-arc {
-            position: absolute;
-            height: 3px;
-            background: linear-gradient(90deg, #f472b6, #a78bfa, #f472b6);
-            border-radius: 4px;
-            pointer-events: none;
-            z-index: 500;
-            opacity: 0;
-            transform-origin: left center;
-            animation: arcPulse 0.55s ease;
-        }
-        @keyframes arcPulse {
-            0%   { opacity: 0; scaleX(0); }
-            30%  { opacity: 1; }
-            70%  { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .action-message { background: #0f172fdd; padding: 0.7rem; border-radius: 20px; text-align: center; font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem; border-left: 4px solid #3b82f6; color: #f1f5f9; }
-
+ 
+        .action-message { background: #0f172fdd; padding: 0.7rem; border-radius: 20px; text-align: center; font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem; border-left: 4px solid #3b82f6; color: #f1f5f9; min-height: 42px; }
+ 
         .controls { display: flex; justify-content: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; }
-
+ 
         button { background: #2d3b60; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; font-size: 0.8rem; color: white; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
         button:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(59,130,246,0.3); }
         button:disabled { background: #475569; cursor: not-allowed; opacity: 0.5; }
-
-        /* Shuffle & Speed buttons */
         #shuffleBtn { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-        #shuffleBtn:hover { background: linear-gradient(135deg, #6d28d9, #9333ea); }
-
+        #shuffleBtn:hover:not(:disabled) { background: linear-gradient(135deg, #6d28d9, #9333ea); }
+ 
         .settings { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: space-between; margin-top: 0.5rem; background: #0f172f88; padding: 0.5rem 1rem; border-radius: 50px; }
         .control-group { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; font-weight: 500; color: #cbd5e6; }
-
-        input[type="range"] { width: 130px; height: 4px; background: #334155; border-radius: 4px; -webkit-appearance: none; }
-        input[type="range"]:focus { outline: none; }
+        input[type="range"] { width: 120px; height: 4px; background: #334155; border-radius: 4px; -webkit-appearance: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #facc15; cursor: pointer; box-shadow: 0 0 6px #facc15; }
-
+ 
         .step-counter { text-align: center; margin-top: 0.8rem; font-size: 0.8rem; font-weight: 500; background: #0f172faa; padding: 0.4rem; border-radius: 40px; color: #e2e8f0; }
-
+ 
         footer { background: #03060cee; padding: 0.6rem; font-size: 0.65rem; text-align: center; border-top: 1px solid #2d3a5e; color: #94a3b8; }
-
+ 
         @media (max-width: 780px) {
-            .number-card { width: 60px; height: 85px; }
+            .number-card { width: 62px; height: 84px; }
             .card-value { font-size: 22px; }
         }
     </style>
@@ -305,43 +211,40 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>⚡ Sorting Algorithm Visualizer | Live Animation</h1>
+        <h1>⚡ Sorting Visualizer · Real Card Swap Animation</h1>
         <div class="complexity-row" id="complexityBadges">
             <span class="badge time">⏱️ Time: O(n²)</span>
             <span class="badge space">💾 Space: O(1)</span>
         </div>
         <div class="header-controls">
             <button class="icon-btn" id="fullscreenBtn">⛶ Fullscreen</button>
-            <button class="icon-btn" id="exitFullscreenBtn" style="display: none;">🗗 Exit</button>
+            <button class="icon-btn" id="exitFullscreenBtn" style="display:none;">🗗 Exit</button>
         </div>
     </div>
-
+ 
     <div class="two-columns">
         <div class="left-panel">
             <div class="code-box">
                 <div class="code-header">
-                    <span>📜 ALGORITHM CODE · <span id="algoNameDisplay">Bubble Sort</span></span>
-                    <span class="live-badge">⚡ current line</span>
+                    <span>📜 CODE · <span id="algoNameDisplay">Bubble Sort</span></span>
+                    <span class="live-badge">⚡ live</span>
                 </div>
                 <div class="code-content" id="codeBlock"></div>
             </div>
             <div class="info-card">
                 <div class="info-title">📖 ALGORITHM INFO</div>
-                <div class="info-text" id="algoDesc">Bubble Sort: Repeatedly steps through list, compares adjacent elements and swaps if wrong order.</div>
-                <div class="complexity-table" id="complexityTable">
-                    <span class="complexity-item">⏱️ Time: O(n²)</span>
-                    <span class="complexity-item">💾 Space: O(1)</span>
-                </div>
+                <div class="info-text" id="algoDesc"></div>
+                <div class="complexity-table" id="complexityTable"></div>
             </div>
             <div class="pointers-panel">
-                <div class="pointers-title">📍 CURRENT POINTERS</div>
+                <div class="pointers-title">📍 POINTERS</div>
                 <div class="pointers-flex">
-                    <div class="pointer-chip"><span class="pointer-label">i (outer):</span><span class="pointer-value" id="ptrI">-</span></div>
-                    <div class="pointer-chip"><span class="pointer-label">j (inner):</span><span class="pointer-value" id="ptrJ">-</span></div>
-                    <div class="pointer-chip"><span class="pointer-label">compare/min:</span><span class="pointer-value" id="ptrExtra">-</span></div>
+                    <div class="pointer-chip"><span class="pointer-label">i:</span><span class="pointer-value" id="ptrI">-</span></div>
+                    <div class="pointer-chip"><span class="pointer-label">j:</span><span class="pointer-value" id="ptrJ">-</span></div>
+                    <div class="pointer-chip"><span class="pointer-label">extra:</span><span class="pointer-value" id="ptrExtra">-</span></div>
                 </div>
             </div>
-            <div class="algo-row" id="algoRow">
+            <div class="algo-row">
                 <button class="algo-btn active" data-algo="bubble">🫧 Bubble</button>
                 <button class="algo-btn" data-algo="selection">🎯 Selection</button>
                 <button class="algo-btn" data-algo="insertion">📌 Insertion</button>
@@ -349,24 +252,20 @@
                 <button class="algo-btn" data-algo="quick">⚡ Quick</button>
                 <button class="algo-btn" data-algo="heap">🗻 Heap</button>
             </div>
-            <div class="sound-mini" id="soundToggleMini">
-                <span>🔊</span> <span id="soundLabel">Sound ON</span>
-            </div>
-
-            <!-- Swap History Log -->
+            <div class="sound-mini" id="soundToggleMini">🔊 <span id="soundLabel">Sound ON</span></div>
             <div class="swap-log-panel">
-                <div class="swap-log-title">🔄 SWAP HISTORY LOG</div>
+                <div class="swap-log-title">🔄 SWAP HISTORY</div>
                 <div class="swap-log-list" id="swapLogList">
-                    <div class="swap-log-entry" style="border-left-color:#60a5fa">No swaps yet — start sorting!</div>
+                    <div class="swap-log-entry" style="border-left-color:#60a5fa">No swaps yet — press AUTO!</div>
                 </div>
             </div>
         </div>
-
+ 
         <div class="right-panel">
             <div class="vis-area" id="visArea">
                 <div class="cards-container" id="cardsContainer"></div>
             </div>
-            <div class="action-message" id="actionMsg">✨ Click AUTO to start sorting with bouncing ball animation</div>
+            <div class="action-message" id="actionMsg">✨ Press AUTO to watch cards physically fly and swap positions!</div>
             <div class="controls">
                 <button id="prevBtn" disabled>◀ PREV</button>
                 <button id="nextBtn">NEXT ▶</button>
@@ -376,334 +275,463 @@
                 <button id="autoBtn">▶ AUTO</button>
             </div>
             <div class="settings">
-                <div class="control-group"><label>🐢 SPEED</label><input type="range" id="speedSlider" min="400" max="1500" value="700"><span id="speedVal">700ms</span></div>
-                <div class="control-group"><label>📊 SIZE</label><input type="range" id="sizeSlider" min="5" max="8" value="6"><span id="sizeVal">6</span></div>
+                <div class="control-group"><label>🐢 SPEED</label><input type="range" id="speedSlider" min="300" max="1800" value="800"><span id="speedVal">800ms</span></div>
+                <div class="control-group"><label>📊 SIZE</label><input type="range" id="sizeSlider" min="4" max="8" value="6"><span id="sizeVal">6</span></div>
             </div>
             <div class="step-counter">Step: <strong id="stepCount">0</strong> / <span id="totalSteps">0</span></div>
         </div>
     </div>
-    <footer>🔴 comparing | 🟢 min/key | 🟢🟢 sorted green | 🟡 bouncing ball | 🔀 arc swap + 3D flip | 📝 swap log history</footer>
+    <footer>🔴 comparing · 🟣 swapping (cards fly!) · 🟢 sorted · 🟡 ball · 📝 swap log · arc-over animation</footer>
 </div>
-
+ 
 <script>
 (function() {
-    let arraySize = 6;
-    let originalArray = [6, 4, 1, 5, 3, 2];
-    let steps = [];
-    let currentStep = 0;
-    let currentAlgo = 'bubble';
-    let autoInterval = null;
-    let autoActive = false;
-    let stepDelay = 700;
-    let soundEnabled = true;
-    let audioCtx = null;
-    let currentBall = null;
-    let swapLogEntries = [];
-    let swapCount = 0;
-
-    const SUITS = ['♠', '♣', '♥', '♦'];
-    const SUIT_COLORS = { '♠': '#a5f3fc', '♣': '#a5f3fc', '♥': '#f87171', '♦': '#f87171' };
-
-    // Fullscreen
-    const body = document.body;
-    const fullBtn = document.getElementById('fullscreenBtn');
-    const exitBtn = document.getElementById('exitFullscreenBtn');
-    fullBtn.addEventListener('click', () => { body.classList.add('fullscreen-active'); fullBtn.style.display='none'; exitBtn.style.display='flex'; setTimeout(refreshRender, 40); });
-    exitBtn.addEventListener('click', () => { body.classList.remove('fullscreen-active'); fullBtn.style.display='flex'; exitBtn.style.display='none'; setTimeout(refreshRender, 40); });
-    function refreshRender() { if(steps[currentStep]) renderCards(steps[currentStep].array, steps[currentStep].pointers||{}, steps[currentStep].swap, steps[currentStep].swapIndices, steps[currentStep].allSorted, false); }
-
-    const algoNames = { bubble:"Bubble Sort", selection:"Selection Sort", insertion:"Insertion Sort", merge:"Merge Sort", quick:"Quick Sort", heap:"Heap Sort" };
-    const algoDescriptions = {
-        bubble: "Bubble Sort: Repeatedly steps through list, compares adjacent elements and swaps them if they are in the wrong order. Largest element 'bubbles' to the end.",
-        selection: "Selection Sort: Divides array into sorted and unsorted regions. Finds minimum in unsorted region and swaps with first unsorted position.",
-        insertion: "Insertion Sort: Builds sorted array one element at a time by inserting each element into its correct position.",
-        merge: "Merge Sort: Divide and conquer algorithm that splits array into halves, recursively sorts them, then merges sorted halves.",
-        quick: "Quick Sort: Picks a pivot element, partitions array so elements smaller than pivot go left, larger go right, then recursively sorts subarrays.",
-        heap: "Heap Sort: Builds a max-heap from array, then repeatedly extracts maximum element and heapifies the remaining array."
+    /* ── STATE ── */
+    let arraySize    = 6;
+    let origArr      = [6,4,1,5,3,2];
+    let steps        = [];
+    let curStep      = 0;
+    let curAlgo      = 'bubble';
+    let autoTimer    = null;
+    let autoOn       = false;
+    let delay        = 800;
+    let soundOn      = true;
+    let audioCtx     = null;
+    let ball         = null;
+    let swapCount    = 0;
+    let animLock     = false; // block next-step during flying animation
+ 
+    const SUITS = ['♠','♣','♥','♦'];
+    const SUIT_CLR = {'♠':'#a5f3fc','♣':'#a5f3fc','♥':'#fb7185','♦':'#fb7185'};
+ 
+    /* ── FULLSCREEN ── */
+    document.getElementById('fullscreenBtn').onclick = () => {
+        document.body.classList.add('fullscreen-active');
+        document.getElementById('fullscreenBtn').style.display = 'none';
+        document.getElementById('exitFullscreenBtn').style.display = 'flex';
     };
-    const complexityMap = { bubble:{time:"O(n²)",space:"O(1)"}, selection:{time:"O(n²)",space:"O(1)"}, insertion:{time:"O(n²)",space:"O(1)"}, merge:{time:"O(n log n)",space:"O(n)"}, quick:{time:"O(n log n) avg",space:"O(log n)"}, heap:{time:"O(n log n)",space:"O(1)"} };
-    const codeMap = {
-        bubble: ["function bubbleSort(arr) {","  let n = arr.length;","  for (let i = 0; i < n-1; i++) {","    for (let j = 0; j < n-i-1; j++) {","      if (arr[j] > arr[j+1]) swap(arr, j, j+1);","    }","  }","  return arr;","}"],
-        selection: ["function selectionSort(arr) {","  let n = arr.length;","  for (let i = 0; i < n-1; i++) {","    let minIdx = i;","    for (let j = i+1; j < n; j++)","      if (arr[j] < arr[minIdx]) minIdx = j;","    if (minIdx !== i) swap(arr, i, minIdx);","  }","  return arr;","}"],
-        insertion: ["function insertionSort(arr) {","  for (let i = 1; i < arr.length; i++) {","    let key = arr[i], j = i-1;","    while (j >= 0 && arr[j] > key) {","      arr[j+1] = arr[j]; j--;","    }","    arr[j+1] = key;","  }","  return arr;","}"],
-        merge: ["function mergeSort(arr, l, r) {","  if(l>=r) return; let m = (l+r)>>1;","  mergeSort(arr,l,m); mergeSort(arr,m+1,r);","  merge(arr,l,m,r);","}","function merge(arr,l,m,r){","  let left=arr.slice(l,m+1), right=arr.slice(m+1,r+1);","  let i=0,j=0,k=l;","  while(i<left.length && j<right.length)","    arr[k++] = left[i]<=right[j] ? left[i++] : right[j++];","  while(i<left.length) arr[k++]=left[i++];","  while(j<right.length) arr[k++]=right[j++];","}"],
-        quick: ["function quickSort(arr, low, high) {","  if(low<high){ let pi=partition(arr,low,high);","    quickSort(arr,low,pi-1); quickSort(arr,pi+1,high);","  }","}","function partition(arr,low,high){","  let pivot=arr[high];","  let i = low-1;","  for(let j=low;j<high;j++)","    if(arr[j]<=pivot) swap(arr,++i,j);","  swap(arr,i+1,high);","  return i+1;","}"],
-        heap: ["function heapSort(arr) {","  let n=arr.length;","  for(let i=(n>>1)-1;i>=0;i--) heapify(arr,n,i);","  for(let i=n-1;i>0;i--) { swap(arr,0,i); heapify(arr,i,0); }","}","function heapify(arr,n,i){","  let largest=i, l=2*i+1, r=2*i+2;","  if(l<n && arr[l]>arr[largest]) largest=l;","  if(r<n && arr[r]>arr[largest]) largest=r;","  if(largest!==i){ swap(arr,i,largest); heapify(arr,n,largest); }","}"]
+    document.getElementById('exitFullscreenBtn').onclick = () => {
+        document.body.classList.remove('fullscreen-active');
+        document.getElementById('fullscreenBtn').style.display = 'flex';
+        document.getElementById('exitFullscreenBtn').style.display = 'none';
     };
-
-    // Audio
-    function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    function playCompare() { if (!soundEnabled) return; try { initAudio(); if(audioCtx.state==='suspended') audioCtx.resume(); const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=540; gain.gain.value=0.05; osc.type='sine'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.1); osc.stop(audioCtx.currentTime+0.1); } catch(e){} }
-    function playSwap() { if (!soundEnabled) return; try { initAudio(); if(audioCtx.state==='suspended') audioCtx.resume(); const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=760; gain.gain.value=0.1; osc.type='triangle'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.12); osc.stop(audioCtx.currentTime+0.12); setTimeout(()=>{ const o2=audioCtx.createOscillator(),g2=audioCtx.createGain(); o2.connect(g2); g2.connect(audioCtx.destination); o2.frequency.value=920; g2.gain.value=0.08; o2.type='triangle'; o2.start(); g2.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.12); o2.stop(audioCtx.currentTime+0.12); },40); } catch(e){} }
-    function playComplete() { if (!soundEnabled) return; try { initAudio(); if(audioCtx.state==='suspended') audioCtx.resume(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>{ const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=f; gain.gain.value=0.09; osc.type='sine'; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.25); osc.stop(audioCtx.currentTime+0.25); },i*90)); } catch(e){} }
-
-    function generateRandomArray(size) { return Array.from({length:size},()=>Math.floor(Math.random()*65)+18); }
-
-    // Swap Log
-    function addSwapLog(val1, idx1, val2, idx2) {
+ 
+    /* ── META ── */
+    const NAMES = {bubble:"Bubble Sort",selection:"Selection Sort",insertion:"Insertion Sort",merge:"Merge Sort",quick:"Quick Sort",heap:"Heap Sort"};
+    const DESCS = {
+        bubble:"Repeatedly compares adjacent elements and swaps them if in wrong order. Largest bubbles to the end each pass.",
+        selection:"Finds the minimum in unsorted region and swaps it to the front. Builds sorted region left to right.",
+        insertion:"Takes one element at a time and inserts it into the correct position in the sorted portion.",
+        merge:"Divide and conquer — splits array in half, sorts each half recursively, then merges them together.",
+        quick:"Picks a pivot, partitions smaller elements left and larger right, then recursively sorts each side.",
+        heap:"Builds a max-heap, then repeatedly extracts the max to place elements in sorted order."
+    };
+    const CMPLX = {bubble:{t:"O(n²)",s:"O(1)"},selection:{t:"O(n²)",s:"O(1)"},insertion:{t:"O(n²)",s:"O(1)"},merge:{t:"O(n log n)",s:"O(n)"},quick:{t:"O(n log n) avg",s:"O(log n)"},heap:{t:"O(n log n)",s:"O(1)"}};
+    const CODE = {
+        bubble:["function bubbleSort(arr) {","  let n = arr.length;","  for (let i = 0; i < n-1; i++) {","    for (let j = 0; j < n-i-1; j++) {","      if (arr[j] > arr[j+1])","        swap(arr, j, j+1);","    }","  }","}"],
+        selection:["function selectionSort(arr) {","  for (let i = 0; i < n-1; i++) {","    let min = i;","    for (let j = i+1; j < n; j++)","      if (arr[j] < arr[min]) min = j;","    if (min !== i) swap(arr, i, min);","  }","}"],
+        insertion:["function insertionSort(arr) {","  for (let i = 1; i < arr.length; i++) {","    let key = arr[i], j = i-1;","    while (j >= 0 && arr[j] > key) {","      arr[j+1] = arr[j]; j--;","    }","    arr[j+1] = key;","  }","}"],
+        merge:["function mergeSort(arr, l, r) {","  if(l>=r) return;","  let m = (l+r)>>1;","  mergeSort(arr,l,m);","  mergeSort(arr,m+1,r);","  merge(arr,l,m,r);","}","// merges two sorted halves","  arr[k++] = left[i]<=right[j]","    ? left[i++] : right[j++];"],
+        quick:["function quickSort(arr, lo, hi) {","  if(lo<hi){","    let p = partition(arr,lo,hi);","    quickSort(arr,lo,p-1);","    quickSort(arr,p+1,hi);","  }","}","function partition(arr,lo,hi){","  let pivot=arr[hi], i=lo-1;","  for(let j=lo;j<hi;j++)","    if(arr[j]<=pivot) swap(arr,++i,j);","  swap(arr,i+1,hi); return i+1;","}"],
+        heap:["function heapSort(arr) {","  let n=arr.length;","  for(let i=(n>>1)-1;i>=0;i--)","    heapify(arr,n,i);","  for(let i=n-1;i>0;i--){","    swap(arr,0,i);","    heapify(arr,i,0);","  }","}","function heapify(arr,n,i){","  let lg=i,l=2*i+1,r=2*i+2;","  if(l<n&&arr[l]>arr[lg])lg=l;","  if(r<n&&arr[r]>arr[lg])lg=r;","  if(lg!==i){swap(arr,i,lg);heapify(arr,n,lg);}","}"]
+    };
+ 
+    /* ── AUDIO ── */
+    function initAudio() { if(!audioCtx&&soundOn) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }
+    function beep(freq,type,vol,dur){ if(!soundOn)return; try{ initAudio(); if(audioCtx.state==='suspended')audioCtx.resume(); const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=freq; o.type=type; g.gain.value=vol; o.start(); g.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+dur); o.stop(audioCtx.currentTime+dur); }catch(e){} }
+    function playCompare(){ beep(520,'sine',0.04,0.09); }
+    function playSwap(){ beep(740,'triangle',0.09,0.1); setTimeout(()=>beep(900,'triangle',0.07,0.1),50); }
+    function playDone(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,'sine',0.08,0.22),i*85)); }
+ 
+    /* ── SWAP LOG ── */
+    function logSwap(v1,i1,v2,i2){
         swapCount++;
-        const entry = `#${swapCount}  [${idx1}]=${val1}  ↔  [${idx2}]=${val2}`;
-        swapLogEntries.push(entry);
-        const list = document.getElementById('swapLogList');
-        const el = document.createElement('div');
-        el.className = 'swap-log-entry';
-        el.textContent = entry;
+        const list=document.getElementById('swapLogList');
+        if(swapCount===1) list.innerHTML='';
+        const el=document.createElement('div');
+        el.className='swap-log-entry';
+        el.textContent=`#${swapCount}  [${i1}]=${v1}  ↔  [${i2}]=${v2}`;
         list.appendChild(el);
-        list.scrollTop = list.scrollHeight;
+        list.scrollTop=list.scrollHeight;
     }
-    function clearSwapLog() {
-        swapLogEntries = [];
-        swapCount = 0;
-        const list = document.getElementById('swapLogList');
-        list.innerHTML = '<div class="swap-log-entry" style="border-left-color:#60a5fa">No swaps yet — start sorting!</div>';
+    function clearLog(){
+        swapCount=0;
+        document.getElementById('swapLogList').innerHTML='<div class="swap-log-entry" style="border-left-color:#60a5fa">No swaps yet — press AUTO!</div>';
     }
-
-    // Draw arc between two swapping cards
-    function drawSwapArc(idx1, idx2) {
+ 
+    /* ── RENDER (static, no swap anim) ── */
+    function renderCards(arr, ptrs={}, swapIdxs=[], allSorted=false){
+        const cont=document.getElementById('cardsContainer');
+        cont.innerHTML='';
+        arr.forEach((val,idx)=>{
+            const wrap=document.createElement('div');
+            wrap.className='card-wrapper';
+            wrap.dataset.idx=idx;
+ 
+            if(ptrs.i===idx){const a=document.createElement('div');a.className='pointer-arrow';a.textContent='▼ i';wrap.appendChild(a);}
+            if(ptrs.j===idx){const a=document.createElement('div');a.className='pointer-arrow';a.textContent='▼ j';wrap.appendChild(a);}
+            if(ptrs.extra===idx){const a=document.createElement('div');a.className='pointer-arrow';a.textContent='▼ pivot';wrap.appendChild(a);}
+ 
+            const card=document.createElement('div');
+            card.className='number-card';
+            card.dataset.cardIdx=idx;
+ 
+            if(ptrs.comparing&&ptrs.comparing.includes(idx)) card.classList.add('comparing');
+            if(ptrs.minFound===idx) card.classList.add('min-found');
+            if(allSorted||(ptrs.sorted&&ptrs.sorted.includes(idx))) card.classList.add('sorted');
+            if(swapIdxs.includes(idx)) card.classList.add('swapping');
+ 
+            const suit=SUITS[val%4];
+            card.innerHTML=`<div class="card-suit" style="color:${SUIT_CLR[suit]}">${suit}</div><div class="card-value">${val}</div><div class="card-index">[${idx}]</div>`;
+            wrap.appendChild(card);
+            cont.appendChild(wrap);
+        });
+    }
+ 
+    /* ── REAL FLYING CARD SWAP ANIMATION ── */
+    // Uses getBoundingClientRect to get actual pixel positions,
+    // then clones both cards as fixed-position elements and
+    // animates them along a cubic bezier arc path
+    function animateSwap(idx1, idx2, onDone){
         const cards = document.querySelectorAll('.card-wrapper');
-        const visArea = document.getElementById('visArea');
-        if (!cards[idx1] || !cards[idx2]) return;
-        const r1 = cards[idx1].getBoundingClientRect();
-        const r2 = cards[idx2].getBoundingClientRect();
-        const vr = visArea.getBoundingClientRect();
-        const x1 = r1.left + r1.width/2 - vr.left;
-        const x2 = r2.left + r2.width/2 - vr.left;
-        const y  = r1.top + r1.height/2 - vr.top;
-        const arc = document.createElement('div');
-        arc.className = 'swap-arc';
-        const left = Math.min(x1,x2);
-        const width = Math.abs(x2-x1);
-        arc.style.left = left + 'px';
-        arc.style.top  = y + 'px';
-        arc.style.width = width + 'px';
-        visArea.appendChild(arc);
-        setTimeout(()=>{ if(arc.parentNode) arc.remove(); }, 600);
-    }
-
-    // Animate bouncing ball
-    function animateBallToCard(cardIndex, onComplete) {
-        if (currentBall) currentBall.remove();
-        const cards = document.querySelectorAll('.card-wrapper');
-        if (!cards[cardIndex]) { if(onComplete) onComplete(); return; }
-        const cardRect = cards[cardIndex].getBoundingClientRect();
-        const visRect  = document.getElementById('visArea').getBoundingClientRect();
-        const targetX  = cardRect.left + cardRect.width/2 - visRect.left;
-        const targetY  = cardRect.top - 15 - visRect.top;
-        const ball = document.createElement('div');
-        ball.className = 'bouncing-ball';
-        ball.style.left = targetX + 'px';
-        ball.style.top  = '-30px';
-        document.getElementById('visArea').appendChild(ball);
-        currentBall = ball;
+        const c1 = cards[idx1];
+        const c2 = cards[idx2];
+        if(!c1||!c2){ onDone(); return; }
+ 
+        const r1 = c1.querySelector('.number-card').getBoundingClientRect();
+        const r2 = c2.querySelector('.number-card').getBoundingClientRect();
+ 
+        // Create flying clones
+        function makeClone(src, rect){
+            const clone = src.querySelector('.number-card').cloneNode(true);
+            clone.className = 'number-card flying-card';
+            clone.style.width  = rect.width  + 'px';
+            clone.style.height = rect.height + 'px';
+            clone.style.left   = rect.left   + 'px';
+            clone.style.top    = rect.top    + 'px';
+            clone.style.borderColor = '#f472b6';
+            clone.style.boxShadow   = '0 0 28px #f472b6cc, 0 12px 28px rgba(0,0,0,0.5)';
+            clone.style.background  = 'linear-gradient(145deg, #2a1035, #18082a)';
+            document.body.appendChild(clone);
+            return clone;
+        }
+ 
+        const fl1 = makeClone(c1, r1);
+        const fl2 = makeClone(c2, r2);
+ 
+        // How far cards need to travel
+        const dx1 = r2.left - r1.left;
+        const dx2 = r1.left - r2.left;
+ 
+        // Arc height (bigger gap = higher arc)
+        const gap = Math.abs(r2.left - r1.left);
+        const arcH = Math.max(60, Math.min(140, gap * 0.55));
+ 
+        const dur = Math.max(420, Math.min(700, delay * 0.72));
         let startTime = null;
-        const duration = 280;
-        function animateDrop(ts) {
-            if (!startTime) startTime = ts;
-            const elapsed = ts - startTime;
-            const progress = Math.min(1, elapsed / duration);
-            const easeOut = 1 - Math.pow(1 - progress, 2);
-            ball.style.left = targetX + 'px';
-            ball.style.top  = (targetY * easeOut) + 'px';
-            if (progress < 1) requestAnimationFrame(animateDrop);
-            else {
-                ball.style.top = targetY + 'px';
-                setTimeout(()=>{ if(onComplete) onComplete(); if(currentBall===ball) setTimeout(()=>{ if(ball.parentNode) ball.remove(); currentBall=null; },120); else ball.remove(); }, 100);
+ 
+        // Cubic ease in-out
+        function ease(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
+ 
+        // Parabolic arc: card1 goes UP then across, card2 goes DOWN then across
+        function frame(ts){
+            if(!startTime) startTime=ts;
+            const t = Math.min(1,(ts-startTime)/dur);
+            const e = ease(t);
+ 
+            // card 1: arc UP (goes above)
+            const y1 = -arcH * Math.sin(Math.PI * t); // peak at t=0.5
+            fl1.style.left = (r1.left + dx1*e) + 'px';
+            fl1.style.top  = (r1.top  + y1)    + 'px';
+ 
+            // card 2: arc DOWN (dips below)
+            const y2 = arcH * 0.5 * Math.sin(Math.PI * t);
+            fl2.style.left = (r2.left + dx2*e) + 'px';
+            fl2.style.top  = (r2.top  + y2)    + 'px';
+ 
+            // scale pulse at mid-flight
+            const sc = 1 + 0.12 * Math.sin(Math.PI * t);
+            fl1.style.transform = `scale(${sc}) rotate(${t*8}deg)`;
+            fl2.style.transform = `scale(${sc}) rotate(${-t*8}deg)`;
+ 
+            if(t < 1){
+                requestAnimationFrame(frame);
+            } else {
+                fl1.remove();
+                fl2.remove();
+                onDone();
             }
         }
-        requestAnimationFrame(animateDrop);
+        requestAnimationFrame(frame);
     }
-
-    // Render cards with all new animations
-    function renderCards(arr, pointers={}, isSwapping=false, swapIndices=[], allSorted=false, doFlip=false, isShuffling=false) {
-        const container = document.getElementById('cardsContainer');
-        container.innerHTML = '';
-        arr.forEach((val, idx) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'card-wrapper';
-
-            // Swap slide animation
-            if (isSwapping && swapIndices && swapIndices.includes(idx)) {
-                wrapper.classList.add(swapIndices[0] > swapIndices[1] ? 'swap-left' : 'swap-right');
-            }
-
-            // Shuffle animation with stagger
-            if (isShuffling) {
-                wrapper.classList.add('shuffle-anim');
-                wrapper.style.animationDelay = (idx * 60) + 'ms';
-            }
-
-            // Pointer arrows
-            if (pointers.i === idx) { const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ i'; wrapper.appendChild(a); }
-            if (pointers.j === idx) { const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ j'; wrapper.appendChild(a); }
-            if (pointers.extra === idx) { const a=document.createElement('div'); a.className='pointer-arrow'; a.innerHTML='▼ min/pivot'; wrapper.appendChild(a); }
-
-            // Card
-            const card = document.createElement('div');
-            card.className = 'number-card';
-
-            if (pointers.comparing?.includes(idx)) card.classList.add('comparing');
-            if (pointers.minFound === idx) card.classList.add('min-found');
-            if (allSorted || (pointers.sorted && pointers.sorted.includes(idx))) {
-                card.classList.add('sorted');
-                card.classList.add('sorted-flash');
-            }
-
-            // 3D flip during swap
-            if (doFlip && isSwapping && swapIndices && swapIndices.includes(idx)) {
-                card.classList.add('flipping');
-            }
-
-            // Suit display
-            const suitIdx = val % 4;
-            const suit = SUITS[suitIdx];
-            const suitColor = SUIT_COLORS[suit];
-
-            card.innerHTML = `
-                <div class="card-suit-top" style="color:${suitColor}">${suit}</div>
-                <div class="card-value">${val}</div>
-                <div class="card-index">[${idx}]</div>
-            `;
-            wrapper.appendChild(card);
-            container.appendChild(wrapper);
-        });
-
-        // Draw arc if swapping two distinct indices
-        if (isSwapping && swapIndices && swapIndices.length === 2 && swapIndices[0] !== swapIndices[1]) {
-            setTimeout(()=>drawSwapArc(swapIndices[0], swapIndices[1]), 10);
+ 
+    /* ── BOUNCING BALL ── */
+    function animBallTo(cardIdx, cb){
+        if(ball) ball.remove();
+        const cards=document.querySelectorAll('.card-wrapper');
+        if(!cards[cardIdx]){ if(cb)cb(); return; }
+        const r=cards[cardIdx].querySelector('.number-card').getBoundingClientRect();
+        const tx=r.left+r.width/2-11;
+        const ty=r.top-28;
+        const b=document.createElement('div');
+        b.className='bouncing-ball';
+        b.style.left=tx+'px';
+        b.style.top='-40px';
+        document.body.appendChild(b);
+        ball=b;
+        let st=null;
+        const DUR=260;
+        function drop(ts){
+            if(!st)st=ts;
+            const p=Math.min(1,(ts-st)/DUR);
+            const e=1-Math.pow(1-p,2);
+            b.style.top=(ty*e)+'px';
+            if(p<1) requestAnimationFrame(drop);
+            else { b.style.top=ty+'px'; setTimeout(()=>{ if(cb)cb(); if(ball===b) setTimeout(()=>{if(b.parentNode)b.remove();ball=null;},100); else b.remove(); },80); }
         }
+        requestAnimationFrame(drop);
     }
-
-    // Step generators
-    function generateBubbleSteps(a) { let s=[],w=[...a],n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Bubble Sort start",lineIdx:2}); for(let i=0;i<n-1;i++) for(let j=0;j<n-i-1;j++){s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`🔍 Compare ${w[j]} & ${w[j+1]}`,compare:true,compareIndices:[j],lineIdx:4}); if(w[j]>w[j+1]){const v1=w[j],v2=w[j+1];[w[j],w[j+1]]=[w[j+1],w[j]]; s.push({array:[...w],pointers:{i,j},desc:`🔄 Swapped ${v2} ↔ ${v1}`,swap:true,swapIndices:[j,j+1],swapVals:[v1,v2],swapIdxs:[j,j+1],lineIdx:4});}} s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete! All green",complete:true,allSorted:true,lineIdx:7}); return s; }
-    function generateSelectionSteps(a) { let s=[],w=[...a],n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Selection Sort start",lineIdx:2}); for(let i=0;i<n-1;i++){let min=i; s.push({array:[...w],pointers:{i,minFound:i,comparing:[i]},desc:`Pass ${i+1}: assume min at ${i}`,lineIdx:3}); for(let j=i+1;j<n;j++){s.push({array:[...w],pointers:{i,j,minFound:min,comparing:[min,j]},desc:`Compare ${w[j]} < ${w[min]}`,compare:true,compareIndices:[j],lineIdx:5}); if(w[j]<w[min]){min=j; s.push({array:[...w],pointers:{i,minFound:min,comparing:[min]},desc:`⭐ New min at ${min}`,lineIdx:5});}} if(min!==i){const v1=w[i],v2=w[min];[w[i],w[min]]=[w[min],w[i]]; s.push({array:[...w],pointers:{i},desc:`Swap [${i}]=${v1} ↔ [${min}]=${v2}`,swap:true,swapIndices:[i,min],swapVals:[v1,v2],swapIdxs:[i,min],lineIdx:6});}} s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete! All green",complete:true,allSorted:true,lineIdx:8}); return s; }
-    function generateInsertionSteps(a) { let s=[],w=[...a],n=w.length; s.push({array:[...w],pointers:{},desc:"✨ Insertion Sort",lineIdx:1}); for(let i=1;i<n;i++){let key=w[i],j=i-1; s.push({array:[...w],pointers:{i,comparing:[i]},desc:`Pick key = ${key}`,lineIdx:2}); while(j>=0&&w[j]>key){const v1=w[j]; s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`Shift ${w[j]} right`,compare:true,compareIndices:[j],lineIdx:3}); w[j+1]=w[j]; s.push({array:[...w],pointers:{i},desc:`Shifted ${v1}`,swap:true,swapIndices:[j+1,j],swapVals:[v1,key],lineIdx:3}); j--;} if(w[j+1]!==key){w[j+1]=key; s.push({array:[...w],pointers:{i},desc:`Inserted ${key}`,swap:true,swapIndices:[j+1],lineIdx:6});}} s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete! All green",complete:true,allSorted:true,lineIdx:8}); return s; }
-    function generateMergeSteps(a) { let s=[],w=[...a]; function merge(l,m,r){let left=w.slice(l,m+1),right=w.slice(m+1,r+1),i=0,j=0,k=l; while(i<left.length&&j<right.length){s.push({array:[...w],pointers:{comparing:[k]},desc:`Compare ${left[i]} & ${right[j]}`,compare:true,compareIndices:[k],lineIdx:9}); if(left[i]<=right[j])w[k++]=left[i++]; else w[k++]=right[j++]; s.push({array:[...w],pointers:{},desc:`Merge step`,swap:true,swapIndices:[k-1],lineIdx:9});} while(i<left.length)w[k++]=left[i++]; while(j<right.length)w[k++]=right[j++];} function ms(l,r){if(l>=r)return; let m=(l+r)>>1; ms(l,m); ms(m+1,r); merge(l,m,r);} s.push({array:[...w],pointers:{},desc:"✨ Merge Sort",lineIdx:1}); ms(0,w.length-1); s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete!",complete:true,allSorted:true}); return s; }
-    function generateQuickSteps(a) { let s=[],w=[...a]; function partition(l,r){let pivot=w[r],i=l-1; for(let j=l;j<r;j++){s.push({array:[...w],pointers:{comparing:[j,r],extra:r},desc:`Compare ${w[j]} <= pivot ${pivot}`,compare:true,compareIndices:[j],lineIdx:9}); if(w[j]<=pivot){i++; const v1=w[i],v2=w[j]; [w[i],w[j]]=[w[j],w[i]]; if(i!==j) s.push({array:[...w],pointers:{},desc:`Swap [${i}]=${v1} ↔ [${j}]=${v2}`,swap:true,swapIndices:[i,j],swapVals:[v1,v2],lineIdx:10});}} const v1=w[i+1],v2=w[r]; [w[i+1],w[r]]=[w[r],w[i+1]]; s.push({array:[...w],pointers:{},desc:`Pivot ${pivot} placed at [${i+1}]`,swap:true,swapIndices:[i+1,r],swapVals:[v1,v2],lineIdx:11}); return i+1;} function qs(l,r){if(l<r){let pi=partition(l,r); qs(l,pi-1); qs(pi+1,r);}} s.push({array:[...w],pointers:{},desc:"✨ Quick Sort (pivot = last element)",lineIdx:1}); qs(0,w.length-1); s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete!",complete:true,allSorted:true}); return s; }
-    function generateHeapSteps(a) { let s=[],w=[...a],n=w.length; function heapify(n,i){let largest=i,l=2*i+1,r=2*i+2; if(l<n&&w[l]>w[largest])largest=l; if(r<n&&w[r]>w[largest])largest=r; if(largest!==i){const v1=w[i],v2=w[largest]; [w[i],w[largest]]=[w[largest],w[i]]; s.push({array:[...w],pointers:{},desc:`Heapify swap [${i}]=${v1} ↔ [${largest}]=${v2}`,swap:true,swapIndices:[i,largest],swapVals:[v1,v2],lineIdx:8}); heapify(n,largest);}} s.push({array:[...w],pointers:{},desc:"✨ Heap Sort",lineIdx:2}); for(let i=Math.floor(n/2)-1;i>=0;i--)heapify(n,i); for(let i=n-1;i>0;i--){const v1=w[0],v2=w[i]; [w[0],w[i]]=[w[i],w[0]]; s.push({array:[...w],pointers:{},desc:`Extract max [0]=${v1} ↔ [${i}]=${v2}`,swap:true,swapIndices:[0,i],swapVals:[v1,v2],lineIdx:4}); heapify(i,0);} s.push({array:[...w],pointers:{},desc:"✅ Sorting Complete!",complete:true,allSorted:true}); return s; }
-
-    function rebuildSteps() {
-        let arr=[...originalArray];
-        if(currentAlgo==='bubble') steps=generateBubbleSteps(arr);
-        else if(currentAlgo==='selection') steps=generateSelectionSteps(arr);
-        else if(currentAlgo==='insertion') steps=generateInsertionSteps(arr);
-        else if(currentAlgo==='merge') steps=generateMergeSteps(arr);
-        else if(currentAlgo==='quick') steps=generateQuickSteps(arr);
-        else steps=generateHeapSteps(arr);
-        currentStep=0; clearSwapLog(); updateUI(); updateStepDisplay(); updateMeta();
-    }
-
-    function highlightCodeLine(line) { document.querySelectorAll('.code-line').forEach((el,idx)=>{ if(idx===line) el.classList.add('highlight'); else el.classList.remove('highlight'); }); }
-
-    function updateUI(doFlip=false) {
+ 
+    /* ── APPLY STEP ── */
+    async function applyStep(withAnim=true){
         if(!steps.length) return;
-        const step=steps[currentStep];
+        const step=steps[curStep];
         if(!step) return;
-        renderCards(step.array, step.pointers||{}, step.swap, step.swapIndices, step.allSorted, doFlip);
-        document.getElementById('ptrI').innerText=step.pointers?.i??'-';
-        document.getElementById('ptrJ').innerText=step.pointers?.j??'-';
-        let extra=step.pointers?.j1??(step.pointers?.minFound??(step.pointers?.extra??'-'));
-        document.getElementById('ptrExtra').innerText=extra;
-        document.getElementById('actionMsg').innerHTML=step.desc;
-        if(step.lineIdx!==undefined) highlightCodeLine(step.lineIdx);
-        if(step.compare) playCompare();
-        if(step.swap) {
+ 
+        // If this is a REAL swap step with two indices → fly animation
+        if(withAnim && step.swap && step.swapIndices && step.swapIndices.length===2 && step.swapIndices[0]!==step.swapIndices[1]){
             playSwap();
-            if(step.swapVals && step.swapIdxs) addSwapLog(step.swapVals[0], step.swapIdxs[0], step.swapVals[1], step.swapIdxs[1]);
-            else if(step.swapVals && step.swapIndices && step.swapIndices.length===2) addSwapLog(step.swapVals[0], step.swapIndices[0], step.swapVals[1], step.swapIndices[1]);
+            // Render with swapping class (cards become invisible)
+            renderCards(step.prevArray||step.array, step.pointers||{}, step.swapIndices, step.allSorted);
+            document.getElementById('actionMsg').innerHTML=step.desc;
+            if(step.lineIdx!==undefined) hlLine(step.lineIdx);
+            // Log swap
+            if(step.swapVals) logSwap(step.swapVals[0],step.swapIndices[0],step.swapVals[1],step.swapIndices[1]);
+ 
+            // Block UI during flight
+            animLock=true;
+            await new Promise(res=>animateSwap(step.swapIndices[0],step.swapIndices[1],res));
+            animLock=false;
+            // Re-render with final array (no swap class)
+            renderCards(step.array, step.pointers||{}, [], step.allSorted);
+        } else {
+            renderCards(step.array, step.pointers||{}, step.swap&&step.swapIndices?step.swapIndices:[], step.allSorted);
+            document.getElementById('actionMsg').innerHTML=step.desc;
+            if(step.lineIdx!==undefined) hlLine(step.lineIdx);
+            if(step.compare && withAnim){
+                playCompare();
+                const ci=step.compareIndices?step.compareIndices[0]:(step.pointers?.j??0);
+                if(ci>=0&&ci<step.array.length)
+                    await new Promise(res=>animBallTo(ci,res));
+            }
+            if(step.swap && (!step.swapIndices||step.swapIndices.length<2)) playSwap();
         }
-        if(step.complete) playComplete();
+ 
+        document.getElementById('ptrI').textContent    = step.pointers?.i??'-';
+        document.getElementById('ptrJ').textContent    = step.pointers?.j??'-';
+        document.getElementById('ptrExtra').textContent= step.pointers?.minFound??step.pointers?.extra??'-';
+        if(step.complete) playDone();
     }
-
-    async function updateUIWithBall(doFlip=true) {
-        if(!steps.length) return;
-        const step=steps[currentStep];
-        if(!step) return;
-        renderCards(step.array, step.pointers||{}, step.swap, step.swapIndices, step.allSorted, doFlip);
-        document.getElementById('ptrI').innerText=step.pointers?.i??'-';
-        document.getElementById('ptrJ').innerText=step.pointers?.j??'-';
-        let extra=step.pointers?.j1??(step.pointers?.minFound??(step.pointers?.extra??'-'));
-        document.getElementById('ptrExtra').innerText=extra;
-        document.getElementById('actionMsg').innerHTML=step.desc;
-        if(step.lineIdx!==undefined) highlightCodeLine(step.lineIdx);
-        if(step.compare) {
-            playCompare();
-            let ci=step.compareIndices?step.compareIndices[0]:(step.pointers?.j!==undefined?step.pointers.j:0);
-            if(ci!==undefined && ci>=0 && ci<step.array.length)
-                await new Promise(resolve=>animateBallToCard(ci,resolve));
+ 
+    function hlLine(n){ document.querySelectorAll('.code-line').forEach((el,i)=>{ el.classList.toggle('highlight',i===n); }); }
+ 
+    /* ── STEP GENERATORS ── */
+    function bubbleSteps(a){
+        let s=[],w=[...a],n=w.length;
+        s.push({array:[...w],pointers:{},desc:"✨ Bubble Sort — let's go!",lineIdx:0});
+        for(let i=0;i<n-1;i++) for(let j=0;j<n-i-1;j++){
+            s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`🔍 Compare [${j}]=${w[j]} vs [${j+1}]=${w[j+1]}`,compare:true,compareIndices:[j],lineIdx:4});
+            if(w[j]>w[j+1]){
+                const prev=[...w],v1=w[j],v2=w[j+1];
+                [w[j],w[j+1]]=[w[j+1],w[j]];
+                s.push({array:[...w],prevArray:prev,pointers:{i,j},desc:`🔄 Swap! ${v1} ↔ ${v2}`,swap:true,swapIndices:[j,j+1],swapVals:[v1,v2],lineIdx:5});
+            }
         }
-        if(step.swap) {
-            playSwap();
-            if(step.swapVals && step.swapIdxs) addSwapLog(step.swapVals[0], step.swapIdxs[0], step.swapVals[1], step.swapIdxs[1]);
-            else if(step.swapVals && step.swapIndices && step.swapIndices.length===2) addSwapLog(step.swapVals[0], step.swapIndices[0], step.swapVals[1], step.swapIndices[1]);
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true,lineIdx:8});
+        return s;
+    }
+    function selectionSteps(a){
+        let s=[],w=[...a],n=w.length;
+        s.push({array:[...w],pointers:{},desc:"✨ Selection Sort start",lineIdx:0});
+        for(let i=0;i<n-1;i++){
+            let mn=i;
+            s.push({array:[...w],pointers:{i,minFound:mn},desc:`Pass ${i+1}: min assumed at [${i}]=${w[i]}`,lineIdx:2});
+            for(let j=i+1;j<n;j++){
+                s.push({array:[...w],pointers:{i,j,minFound:mn,comparing:[mn,j]},desc:`Compare [${j}]=${w[j]} < min ${w[mn]}?`,compare:true,compareIndices:[j],lineIdx:3});
+                if(w[j]<w[mn]){ mn=j; s.push({array:[...w],pointers:{i,minFound:mn},desc:`⭐ New min at [${mn}]=${w[mn]}`,lineIdx:3}); }
+            }
+            if(mn!==i){
+                const prev=[...w],v1=w[i],v2=w[mn];
+                [w[i],w[mn]]=[w[mn],w[i]];
+                s.push({array:[...w],prevArray:prev,pointers:{i},desc:`🔄 Swap [${i}]=${v1} ↔ [${mn}]=${v2}`,swap:true,swapIndices:[i,mn],swapVals:[v1,v2],lineIdx:5});
+            }
         }
-        if(step.complete) playComplete();
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true});
+        return s;
     }
-
-    function updateMeta() {
-        const lines=codeMap[currentAlgo];
-        document.getElementById('codeBlock').innerHTML=lines.map((l,idx)=>`<span class="code-line">${escapeHtml(l)}</span>`).join('\n');
-        document.getElementById('algoDesc').innerHTML=algoDescriptions[currentAlgo];
-        document.getElementById('algoNameDisplay').innerHTML=algoNames[currentAlgo];
-        const comp=complexityMap[currentAlgo];
-        document.getElementById('complexityTable').innerHTML=`<span class="complexity-item">⏱️ Time: ${comp.time}</span><span class="complexity-item">💾 Space: ${comp.space}</span>`;
-        document.getElementById('complexityBadges').innerHTML=`<span class="badge time">⏱️ Time: ${comp.time}</span><span class="badge space">💾 Space: ${comp.space}</span>`;
-        if(steps[currentStep]?.lineIdx!==undefined) highlightCodeLine(steps[currentStep].lineIdx);
+    function insertionSteps(a){
+        let s=[],w=[...a],n=w.length;
+        s.push({array:[...w],pointers:{},desc:"✨ Insertion Sort start",lineIdx:0});
+        for(let i=1;i<n;i++){
+            let key=w[i],j=i-1;
+            s.push({array:[...w],pointers:{i,comparing:[i]},desc:`Pick key=${key}`,lineIdx:2});
+            while(j>=0&&w[j]>key){
+                const prev=[...w],v1=w[j];
+                s.push({array:[...w],pointers:{i,j,comparing:[j,j+1]},desc:`Shift [${j}]=${w[j]} right`,compare:true,compareIndices:[j],lineIdx:3});
+                w[j+1]=w[j]; j--;
+                s.push({array:[...w],prevArray:prev,pointers:{i},desc:`Shifted`,swap:true,swapIndices:[j+1,j+2],swapVals:[v1,key],lineIdx:4});
+            }
+            if(w[j+1]!==key){w[j+1]=key; s.push({array:[...w],pointers:{i},desc:`Inserted ${key} at [${j+1}]`,lineIdx:5});}
+        }
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true});
+        return s;
     }
-    function escapeHtml(s){return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
-    function updateStepDisplay(){document.getElementById('stepCount').innerText=currentStep+1;document.getElementById('totalSteps').innerText=steps.length;document.getElementById('prevBtn').disabled=currentStep<=0;document.getElementById('nextBtn').disabled=currentStep>=steps.length-1;}
-
-    async function nextStepWithBall(){if(steps.length&&currentStep<steps.length-1){currentStep++;await updateUIWithBall(true);updateStepDisplay();}}
-    async function prevStepWithBall(){if(steps.length&&currentStep>0){currentStep--;await updateUIWithBall(false);updateStepDisplay();if(autoActive)stopAuto();}}
-    function resetStep(){currentStep=0;clearSwapLog();updateUI(false);updateStepDisplay();if(autoActive)stopAuto();if(currentBall)currentBall.remove();}
-    function randomize(){originalArray=generateRandomArray(arraySize);rebuildSteps();if(autoActive)stopAuto();if(currentBall)currentBall.remove();}
-
-    // Shuffle with stagger animation
-    function shuffleWithAnimation() {
-        if(autoActive) stopAuto();
-        originalArray = generateRandomArray(arraySize);
-        // Render with shuffle anim
-        const container = document.getElementById('cardsContainer');
-        container.innerHTML = '';
-        originalArray.forEach((val, idx) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'card-wrapper shuffle-anim';
-            wrapper.style.animationDelay = (idx * 70) + 'ms';
-            const suitIdx = val % 4;
-            const suit = SUITS[suitIdx];
-            const suitColor = SUIT_COLORS[suit];
-            const card = document.createElement('div');
-            card.className = 'number-card';
-            card.innerHTML = `<div class="card-suit-top" style="color:${suitColor}">${suit}</div><div class="card-value">${val}</div><div class="card-index">[${idx}]</div>`;
-            wrapper.appendChild(card);
-            container.appendChild(wrapper);
+    function mergeSteps(a){
+        let s=[],w=[...a];
+        function mg(l,m,r){ let L=w.slice(l,m+1),R=w.slice(m+1,r+1),i=0,j=0,k=l; while(i<L.length&&j<R.length){ s.push({array:[...w],pointers:{comparing:[k]},desc:`Merge: ${L[i]} vs ${R[j]}`,compare:true,compareIndices:[k],lineIdx:8}); const prev=[...w]; if(L[i]<=R[j])w[k++]=L[i++]; else w[k++]=R[j++]; s.push({array:[...w],prevArray:prev,pointers:{},desc:`Placed`,swap:true,swapIndices:[k-1],lineIdx:9}); } while(i<L.length)w[k++]=L[i++]; while(j<R.length)w[k++]=R[j++]; }
+        function ms(l,r){ if(l>=r)return; let m=(l+r)>>1; ms(l,m); ms(m+1,r); mg(l,m,r); }
+        s.push({array:[...w],pointers:{},desc:"✨ Merge Sort",lineIdx:0});
+        ms(0,w.length-1);
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true});
+        return s;
+    }
+    function quickSteps(a){
+        let s=[],w=[...a];
+        function part(l,r){ let pv=w[r],i=l-1; for(let j=l;j<r;j++){ s.push({array:[...w],pointers:{comparing:[j,r],extra:r},desc:`Compare [${j}]=${w[j]} ≤ pivot ${pv}?`,compare:true,compareIndices:[j],lineIdx:9}); if(w[j]<=pv){ i++; if(i!==j){ const prev=[...w],v1=w[i],v2=w[j]; [w[i],w[j]]=[w[j],w[i]]; s.push({array:[...w],prevArray:prev,pointers:{},desc:`🔄 Swap ${v1} ↔ ${v2}`,swap:true,swapIndices:[i,j],swapVals:[v1,v2],lineIdx:10}); } } } const prev=[...w],v1=w[i+1],v2=w[r]; [w[i+1],w[r]]=[w[r],w[i+1]]; s.push({array:[...w],prevArray:prev,pointers:{},desc:`Pivot ${pv} placed at [${i+1}]`,swap:true,swapIndices:[i+1,r],swapVals:[v1,v2],lineIdx:11}); return i+1; }
+        function qs(l,r){ if(l<r){ let p=part(l,r); qs(l,p-1); qs(p+1,r); } }
+        s.push({array:[...w],pointers:{},desc:"✨ Quick Sort — pivot = last element",lineIdx:0});
+        qs(0,w.length-1);
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true});
+        return s;
+    }
+    function heapSteps(a){
+        let s=[],w=[...a],n=w.length;
+        function hy(n,i){ let lg=i,l=2*i+1,r=2*i+2; if(l<n&&w[l]>w[lg])lg=l; if(r<n&&w[r]>w[lg])lg=r; if(lg!==i){ const prev=[...w],v1=w[i],v2=w[lg]; [w[i],w[lg]]=[w[lg],w[i]]; s.push({array:[...w],prevArray:prev,pointers:{},desc:`Heapify [${i}]=${v1} ↔ [${lg}]=${v2}`,swap:true,swapIndices:[i,lg],swapVals:[v1,v2],lineIdx:10}); hy(n,lg); } }
+        s.push({array:[...w],pointers:{},desc:"✨ Heap Sort — building heap",lineIdx:0});
+        for(let i=Math.floor(n/2)-1;i>=0;i--)hy(n,i);
+        for(let i=n-1;i>0;i--){ const prev=[...w],v1=w[0],v2=w[i]; [w[0],w[i]]=[w[i],w[0]]; s.push({array:[...w],prevArray:prev,pointers:{},desc:`Extract max [0]=${v1} → [${i}]`,swap:true,swapIndices:[0,i],swapVals:[v1,v2],lineIdx:6}); hy(i,0); }
+        s.push({array:[...w],pointers:{},desc:"✅ All sorted!",complete:true,allSorted:true});
+        return s;
+    }
+ 
+    function rebuild(){
+        const m={bubble:bubbleSteps,selection:selectionSteps,insertion:insertionSteps,merge:mergeSteps,quick:quickSteps,heap:heapSteps};
+        steps=m[curAlgo]([...origArr]);
+        curStep=0; clearLog(); applyStep(false); updateDisplay(); updateMeta();
+    }
+ 
+    function updateDisplay(){
+        document.getElementById('stepCount').textContent=curStep+1;
+        document.getElementById('totalSteps').textContent=steps.length;
+        document.getElementById('prevBtn').disabled=curStep<=0||animLock;
+        document.getElementById('nextBtn').disabled=curStep>=steps.length-1||animLock;
+    }
+ 
+    function updateMeta(){
+        const lines=CODE[curAlgo];
+        document.getElementById('codeBlock').innerHTML=lines.map((l,i)=>`<span class="code-line">${esc(l)}</span>`).join('\n');
+        document.getElementById('algoDesc').textContent=DESCS[curAlgo];
+        document.getElementById('algoNameDisplay').textContent=NAMES[curAlgo];
+        const c=CMPLX[curAlgo];
+        document.getElementById('complexityTable').innerHTML=`<span class="complexity-item">⏱️ ${c.t}</span><span class="complexity-item">💾 ${c.s}</span>`;
+        document.getElementById('complexityBadges').innerHTML=`<span class="badge time">⏱️ ${c.t}</span><span class="badge space">💾 ${c.s}</span>`;
+        if(steps[curStep]?.lineIdx!=null) hlLine(steps[curStep].lineIdx);
+    }
+    function esc(s){ return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+ 
+    /* ── NAVIGATION ── */
+    async function goNext(){
+        if(animLock||curStep>=steps.length-1) return;
+        curStep++;
+        await applyStep(true);
+        updateDisplay();
+    }
+    async function goPrev(){
+        if(animLock||curStep<=0) return;
+        if(autoOn) stopAuto();
+        curStep--;
+        await applyStep(false); // no anim going back
+        updateDisplay();
+    }
+    function resetStep(){ if(autoOn)stopAuto(); curStep=0; clearLog(); applyStep(false); updateDisplay(); if(ball)ball.remove(); }
+    function randomize(){ if(autoOn)stopAuto(); origArr=Array.from({length:arraySize},()=>Math.floor(Math.random()*65)+18); rebuild(); if(ball)ball.remove(); }
+ 
+    function shuffleAnim(){
+        if(autoOn)stopAuto();
+        origArr=Array.from({length:arraySize},()=>Math.floor(Math.random()*65)+18);
+        // Quick visual shuffle pop
+        const cont=document.getElementById('cardsContainer');
+        const wrappers=cont.querySelectorAll('.card-wrapper');
+        wrappers.forEach((w,i)=>{
+            w.style.transition=`transform 0.3s ${i*55}ms, opacity 0.3s ${i*55}ms`;
+            w.style.transform='translateY(-40px) scale(0.8)';
+            w.style.opacity='0';
         });
-        setTimeout(()=>rebuildSteps(), arraySize * 70 + 450);
-        if(currentBall) currentBall.remove();
+        setTimeout(()=>rebuild(), arraySize*55+350);
+        if(ball)ball.remove();
     }
-
-    function changeSize(v){arraySize=v;document.getElementById('sizeVal').innerText=arraySize;originalArray=arraySize===6?[6,4,1,5,3,2]:generateRandomArray(arraySize);rebuildSteps();if(autoActive)stopAuto();if(currentBall)currentBall.remove();}
-    function startAuto(){if(autoInterval)clearTimeout(autoInterval);autoActive=true;document.getElementById('autoBtn').innerHTML='⏸ STOP';function step(){if(currentStep<steps.length-1){nextStepWithBall().then(()=>{if(autoActive)autoInterval=setTimeout(step,stepDelay);});}else{stopAuto();}}autoInterval=setTimeout(step,stepDelay);}
-    function stopAuto(){if(autoInterval)clearTimeout(autoInterval);autoActive=false;document.getElementById('autoBtn').innerHTML='▶ AUTO';}
-    function toggleAuto(){if(autoActive)stopAuto();else startAuto();}
-    function toggleSound(){soundEnabled=!soundEnabled;document.getElementById('soundLabel').innerText=soundEnabled?'Sound ON':'Sound OFF';if(soundEnabled&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume();}
-
-    // Events
-    document.getElementById('prevBtn').onclick=()=>{if(autoActive)stopAuto();prevStepWithBall();};
-    document.getElementById('nextBtn').onclick=()=>{if(autoActive)stopAuto();nextStepWithBall();};
-    document.getElementById('resetBtn').onclick=()=>{if(autoActive)stopAuto();resetStep();};
-    document.getElementById('randomBtn').onclick=()=>{if(autoActive)stopAuto();randomize();};
-    document.getElementById('shuffleBtn').onclick=shuffleWithAnimation;
+ 
+    function startAuto(){
+        if(autoTimer)clearTimeout(autoTimer);
+        autoOn=true;
+        document.getElementById('autoBtn').textContent='⏸ STOP';
+        function tick(){
+            if(curStep<steps.length-1&&!animLock){
+                goNext().then(()=>{ if(autoOn) autoTimer=setTimeout(tick,delay); });
+            } else if(curStep>=steps.length-1){ stopAuto(); }
+            else { autoTimer=setTimeout(tick,100); } // wait if locked
+        }
+        autoTimer=setTimeout(tick,delay);
+    }
+    function stopAuto(){ if(autoTimer)clearTimeout(autoTimer); autoOn=false; document.getElementById('autoBtn').textContent='▶ AUTO'; }
+    function toggleAuto(){ autoOn?stopAuto():startAuto(); }
+ 
+    /* ── EVENTS ── */
+    document.getElementById('prevBtn').onclick=goPrev;
+    document.getElementById('nextBtn').onclick=()=>{if(autoOn)stopAuto(); goNext();};
+    document.getElementById('resetBtn').onclick=resetStep;
+    document.getElementById('randomBtn').onclick=randomize;
+    document.getElementById('shuffleBtn').onclick=shuffleAnim;
     document.getElementById('autoBtn').onclick=toggleAuto;
-    document.getElementById('soundToggleMini').onclick=toggleSound;
-    document.getElementById('speedSlider').oninput=(e)=>{stepDelay=parseInt(e.target.value);document.getElementById('speedVal').innerText=stepDelay+'ms';if(autoActive){stopAuto();startAuto();}};
-    document.getElementById('sizeSlider').oninput=(e)=>{if(autoActive)stopAuto();changeSize(parseInt(e.target.value));};
-    document.querySelectorAll('.algo-btn').forEach(btn=>{btn.onclick=()=>{const algo=btn.getAttribute('data-algo');if(algo===currentAlgo)return;if(autoActive)stopAuto();currentAlgo=algo;document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rebuildSteps();if(currentBall)currentBall.remove();};});
-
-    originalArray=[6,4,1,5,3,2]; arraySize=6;
-    document.getElementById('sizeSlider').value=6; document.getElementById('sizeVal').innerText=6;
-    rebuildSteps();
-    document.body.addEventListener('click',()=>{if(soundEnabled&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},{once:true});
+    document.getElementById('soundToggleMini').onclick=()=>{
+        soundOn=!soundOn;
+        document.getElementById('soundLabel').textContent=soundOn?'Sound ON':'Sound OFF';
+        if(soundOn&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+    };
+    document.getElementById('speedSlider').oninput=e=>{
+        delay=parseInt(e.target.value);
+        document.getElementById('speedVal').textContent=delay+'ms';
+        if(autoOn){stopAuto();startAuto();}
+    };
+    document.getElementById('sizeSlider').oninput=e=>{
+        if(autoOn)stopAuto();
+        arraySize=parseInt(e.target.value);
+        document.getElementById('sizeVal').textContent=arraySize;
+        origArr=Array.from({length:arraySize},()=>Math.floor(Math.random()*65)+18);
+        rebuild();
+        if(ball)ball.remove();
+    };
+    document.querySelectorAll('.algo-btn').forEach(btn=>{
+        btn.onclick=()=>{
+            const algo=btn.dataset.algo;
+            if(algo===curAlgo)return;
+            if(autoOn)stopAuto();
+            curAlgo=algo;
+            document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            rebuild();
+            if(ball)ball.remove();
+        };
+    });
+    document.body.addEventListener('click',()=>{ if(soundOn&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume(); },{once:true});
+ 
+    /* ── INIT ── */
+    origArr=[6,4,1,5,3,2]; arraySize=6;
+    document.getElementById('sizeSlider').value=6;
+    document.getElementById('sizeVal').textContent=6;
+    rebuild();
 })();
 </script>
 </body>
 </html>
+ 
